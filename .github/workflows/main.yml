@@ -8,10 +8,10 @@ on:
   [workflow_dispatch]
 
 env:
-  AZURE_RESOURCE_GROUP: devsecops-poc-rg
-  AZURE_WEBAPP_NAME: devsecopspocappcontainer
-  AZURE_APP_PLAN: devsecopspocplan
-  ACR_NAME: devsecopspocacr
+  AZURE_RESOURCE_GROUP: edgar-devsecops-poc-rg
+  AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
+  AZURE_APP_PLAN: edgar-devsecopspocplan
+  ACR_NAME: aknot242
 
 jobs:
   build:
@@ -63,13 +63,13 @@ jobs:
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Create ACR
-      uses: azure/CLI@v1
-      with:
-       azcliversion: latest
-       inlineScript: |
-        az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location centralus
-        az acr create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.ACR_NAME }} --sku Basic
+#     - name: Create ACR
+#       uses: azure/CLI@v1
+#       with:
+#        azcliversion: latest
+#        inlineScript: |
+#         az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location westus2
+#         az acr create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.ACR_NAME }} --sku Basic
                 
     - uses: azure/docker-login@v1
       name: ACR Login
@@ -95,7 +95,7 @@ jobs:
         azcliversion: latest
         inlineScript: |
           az account show
-          az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=centralus
+          az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
           az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_WEBAPP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80      
        
     - name: Azure logout
