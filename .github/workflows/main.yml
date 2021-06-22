@@ -63,14 +63,6 @@ jobs:
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-#     - name: Create ACR
-#       uses: azure/CLI@v1
-#       with:
-#        azcliversion: latest
-#        inlineScript: |
-#         az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location westus2
-#         az acr create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.ACR_NAME }} --sku Basic
-                
     - uses: azure/docker-login@v1
       name: ACR Login
       with:
@@ -83,7 +75,7 @@ jobs:
         docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest .
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest 
     
-    Container Scan using GitHub Container action
+#     Container Scan using GitHub Container action
     - uses: Azure/container-scan@v0.1
       name: GitHub Container Scan
       with:
