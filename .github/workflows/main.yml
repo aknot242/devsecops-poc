@@ -8,7 +8,7 @@ on:
   [workflow_dispatch]
 
 env:
-  AZURE_RESOURCE_GROUP: edgar-devsecops-poc-rg
+  AZURE_RESOURCE_GROUP: edgar-rg
   AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
   AZURE_APP_PLAN: edgar-devsecopspocplan
   ACR_NAME: aknot242
