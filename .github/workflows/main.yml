@@ -80,14 +80,14 @@ jobs:
 
     - run: |
         cd DotNetCoreWebApp
-        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} .
-        docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} 
+        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest .
+        docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest 
     
-    # Container Scan using GitHub Container action
-    # - uses: Azure/container-scan@v0
-    #   name: GitHub Container Scan
-    #   with:
-    #     image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
+    Container Scan using GitHub Container action
+    - uses: Azure/container-scan@v0.1
+      name: GitHub Container Scan
+      with:
+        image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest
 
     - name: Create a new ACI for Container
       uses: azure/CLI@v1
