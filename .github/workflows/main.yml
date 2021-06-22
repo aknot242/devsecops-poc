@@ -82,7 +82,6 @@ jobs:
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
       name: Build and push container
     
-#     Container Scan using GitHub Container action
     - uses: Azure/container-scan@v0.1
       name: GitHub Container Scan
       with:
@@ -96,7 +95,12 @@ jobs:
           az account show
           az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
           az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_WEBAPP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80      
-       
+
+    - name: OWASP ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.3.0
+      with:
+        target: "http://edgar-devsecopspocappcontainer.westus2.azurecontainer.io/"
+
     - name: Azure logout
       run: |
         az logout
