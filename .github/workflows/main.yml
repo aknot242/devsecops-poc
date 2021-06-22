@@ -3,9 +3,15 @@ name: DevSecOps GitHub Action CI-CD
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch- test
 on:
-  # push:
-  #   branches: [ master ]
-  [workflow_dispatch]
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    ignore-tags:
+      - "*"
+  workflow_dispatch:
 
 env:
   AZURE_RESOURCE_GROUP: edgar-rg
