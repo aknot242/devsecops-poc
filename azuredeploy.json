@@ -9,6 +9,13 @@
                 "description": "Edgar DevSecOps POC container group"
             }
         },
+        "siteName": {
+            "type": "string",
+            "defaultValue": "edgar-devsecopspoc",
+            "metadata": {
+                "description": "The site name, the first segment of the WordPress site FQDN (e.g. mywordpress.westus.azurecontainer.io)"
+            }
+        },
         "imageRegistryLoginServer": {
             "type": "string"
         },
@@ -72,6 +79,7 @@
                 ],
                 "osType": "Linux",
                 "ipAddress": {
+                    "dnsNameLabel": "[parameters('siteName')]",
                     "type": "Public",
                     "ports": [
                         {
