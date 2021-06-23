@@ -44,18 +44,6 @@
             "properties": {
                 "containers": [
                     {
-                        "name": "[variables('container1Name')]",
-                        "properties": {
-                            "image": "[parameters('container1Image')]",
-                            "resources": {
-                                "requests": {
-                                    "cpu": 1,
-                                    "memoryInGb": 1.5
-                                }
-                            }
-                        }
-                    },
-                    {
                         "name": "[variables('container2Name')]",
                         "properties": {
                             "image": "[parameters('container2Image')]",
