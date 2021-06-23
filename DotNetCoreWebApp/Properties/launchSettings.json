@@ -26,14 +26,15 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "launchUrl": "{Scheme}://{ServiceHost}:44374",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "ASPNETCORE_HTTPS_PORT": "44345"
+        "ASPNETCORE_URLS": "https://+:44374;http://+:3000",
+        "ASPNETCORE_HTTPS_PORT": "3443"
       },
+      "publishAllPorts": true,
       "httpPort": 50758,
       "useSSL": true,
-      "sslPort": 44345
+      "sslPort": 44374
     }
   }
 }
