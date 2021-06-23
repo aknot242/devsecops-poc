@@ -10,3 +10,9 @@
   - Container action has been added
   - Anchore container scanning third-party open source tool has been added
 - [Blog post link](https://www.ais.com/devsecops-with-github-actions/)
+
+
+#### Build NAP Container and push to ACR
+``` bash
+az acr build --image nginx-app-protect:3.2 --registry aknot242.azurecr.io --file Dockerfile .
+```

@@ -1,0 +1,8 @@
+# Copy configuration files into final container
+FROM aknot242.azurecr.io/nginx-app-protect:3.2
+
+COPY nginx.conf /etc/nginx/
+COPY log-policy.json waf-policy.json /etc/app_protect/conf/
+
+EXPOSE 80
+EXPOSE 443

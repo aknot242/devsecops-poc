@@ -1,3 +1,5 @@
 **/DotNetCoreWebApp/obj
 **/DotNetCoreWebApp/bin
 **/.vscode
+*.crt
+*.key
