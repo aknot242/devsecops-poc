@@ -26,8 +26,8 @@
         }
     },
     "variables": {
-        "container1name": "dotnetcorewebapp",
-        "container2name": "nap-dotnetcorewebapp"
+        "container1Name": "dotnetcorewebapp",
+        "container2Name": "nap-dotnetcorewebapp"
     },
     "resources": [
         {
@@ -38,7 +38,7 @@
             "properties": {
                 "containers": [
                     {
-                        "name": "[variables('container1name')]",
+                        "name": "[variables('container1Name')]",
                         "properties": {
                             "image": "[parameters('container1Image')]",
                             "resources": {
@@ -50,7 +50,7 @@
                         }
                     },
                     {
-                        "name": "[variables('container2name')]",
+                        "name": "[variables('container2Name')]",
                         "properties": {
                             "image": "[parameters('container2Image')]",
                             "resources": {
