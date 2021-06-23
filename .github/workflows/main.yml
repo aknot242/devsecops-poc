@@ -88,7 +88,6 @@ jobs:
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
       name: Build and push app container
   
-  test:
     - uses: Azure/container-scan@v0.1
       name: GitHub Container Scan
       with:
