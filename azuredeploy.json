@@ -17,13 +17,17 @@
         },
         "imageRegistryPassword": {
             "type": "string"
+        },
+        "container1Image": {
+            "type": "string"
+        },
+        "container2Image": {
+            "type": "string"
         }
     },
     "variables": {
         "container1name": "dotnetcorewebapp",
-        "container1image": "aknot242.azurecr.io/dotnetcorewebapp",
-        "container2name": "nap-dotnetcorewebapp",
-        "container2image": "aknot242.azurecr.io/nap-dotnetcorewebapp"
+        "container2name": "nap-dotnetcorewebapp"
     },
     "resources": [
         {
@@ -36,7 +40,7 @@
                     {
                         "name": "[variables('container1name')]",
                         "properties": {
-                            "image": "[variables('container1image')]",
+                            "image": "[parameters('container1Image')]",
                             "resources": {
                                 "requests": {
                                     "cpu": 1,
@@ -48,7 +52,7 @@
                     {
                         "name": "[variables('container2name')]",
                         "properties": {
-                            "image": "[variables('container2image')]",
+                            "image": "[parameters('container2Image')]",
                             "resources": {
                                 "requests": {
                                     "cpu": 2,

@@ -118,7 +118,7 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }}
+        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} container2Image${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
 
     - name: OWASP ZAP Scan
       uses: zaproxy/action-baseline@v0.4.0
