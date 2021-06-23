@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
 WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:3000
 EXPOSE 3000
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
