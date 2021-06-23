@@ -16,7 +16,7 @@ on:
 env:
   AZURE_RESOURCE_GROUP: edgar-rg
   AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
-  AZURE_APP_PLAN: edgar-devsecopspocplan
+  AZURE_NAP_NAME: edgar-nap-devsecopspocappcontainer
   ACR_NAME: aknot242
 
 jobs:
@@ -93,7 +93,7 @@ jobs:
       with:
         image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
-    - name: Create a new ACI for Container
+    - name: Create a new ACI for App Container
       uses: azure/CLI@v1
       with:
         azcliversion: latest
@@ -102,10 +102,19 @@ jobs:
           az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
           az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_WEBAPP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80
 
+    - name: Create a new ACI for NAP Container
+      uses: azure/CLI@v1
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+          az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
+          az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_NAP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_NAP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80
+
     - name: OWASP ZAP Scan
       uses: zaproxy/action-baseline@v0.4.0
       with:
-        target: "http://edgar-devsecopspocappcontainer.westus2.azurecontainer.io/"
+        target: "http://edgar-nap-devsecopspocappcontainer.westus2.azurecontainer.io/"
         rules_file_name: '.github/zap/rules.tsv'
         fail_action: true
 
