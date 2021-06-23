@@ -44,13 +44,13 @@
             "properties": {
                 "containers": [
                     {
-                        "name": "[variables('container1Name')]",
+                        "name": "[variables('container2Name')]",
                         "properties": {
-                            "image": "[parameters('container1Image')]",
+                            "image": "[parameters('container2Image')]",
                             "resources": {
                                 "requests": {
-                                    "cpu": 1,
-                                    "memoryInGb": 1.5
+                                    "cpu": 2,
+                                    "memoryInGb": 4
                                 }
                             },
                             "ports": [
