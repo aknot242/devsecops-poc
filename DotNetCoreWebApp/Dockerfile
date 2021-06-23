@@ -17,4 +17,4 @@ RUN dotnet publish "DotNetCoreWebApp.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DotNetCoreWebApp.dll"]
+ENTRYPOINT ["dotnet", "DotNetCoreWebApp.dll --urls=http://localhost:3000"]
