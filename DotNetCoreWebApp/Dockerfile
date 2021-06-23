@@ -1,7 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://+:3000
-EXPOSE 3000
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
@@ -16,5 +14,7 @@ RUN dotnet publish "DotNetCoreWebApp.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+EXPOSE 3000
+ENV ASPNETCORE_URLS=http://*:3000
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DotNetCoreWebApp.dll --urls=http://localhost:3000"]
+ENTRYPOINT ["dotnet", "DotNetCoreWebApp.dll"]
