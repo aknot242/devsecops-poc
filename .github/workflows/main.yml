@@ -100,6 +100,7 @@ jobs:
       uses: zaproxy/action-baseline@v0.4.0
       with:
         target: "http://edgar-devsecopspocappcontainer.westus2.azurecontainer.io/"
+        rules_file_name: '.github/zap/rules.tsv'
 
     - name: Azure logout
       run: |
