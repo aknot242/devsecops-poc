@@ -4,3 +4,5 @@
 10020	IGNORE	(X-Frame-Options Header Not Set) 
 10021	IGNORE	(X-Content-Type-Options Header Missing)
 10038	IGNORE	(Content Security Policy (CSP) Header Not Set)
+10202	IGNORE	(Absence of Anti-CSRF Tokens)
+20012	IGNORE	(Anti-CSRF Tokens Check)
