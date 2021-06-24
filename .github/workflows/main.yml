@@ -103,7 +103,7 @@ jobs:
         parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME }}
 
     - name: OWASP ZAP Scan
-      uses: zaproxy/action-baseline@v0.4.0
+      uses: zaproxy/action-full-scan@v0.2.0
       with:
         target: "http://${{ env.SITE_NAME }}.westus2.azurecontainer.io/"
         rules_file_name: '.github/zap/rules.tsv'

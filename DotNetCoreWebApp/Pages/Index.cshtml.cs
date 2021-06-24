@@ -17,6 +17,9 @@ namespace DotNetCoreWebApp.Pages
             _logger = logger;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+
         public void OnGet()
         {
 

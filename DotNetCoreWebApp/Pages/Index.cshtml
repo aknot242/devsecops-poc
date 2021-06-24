@@ -6,5 +6,16 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome to DevSecOps</h1>
-    <p>.NET Core Container running in Azure Container Instance!</a>.</p>
+    <p>.NET Core Container running in an Azure Container Instance!</a>.</p>
 </div>
+
+<div class="text-center">
+    <form>
+        <input asp-for="SearchString" />
+        <input type="submit" value="Search" />
+    </form>
+</div>
+@if (!string.IsNullOrEmpty(@Model.SearchString))
+{
+    <div class="text-center">Search result: @Html.Raw(@Model.SearchString)</div>
+}
