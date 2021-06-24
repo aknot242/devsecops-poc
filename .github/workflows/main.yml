@@ -94,26 +94,7 @@ jobs:
       with:
         image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
-    # - name: Create a new ACI for App Container
-    #   uses: azure/CLI@v1
-    #   with:
-    #     azcliversion: latest
-    #     inlineScript: |
-    #       az account show
-    #       az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
-    #       az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_WEBAPP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80
-
-    # - name: Create a new ACI for NAP Container
-    #   uses: azure/CLI@v1
-    #   with:
-    #     azcliversion: latest
-    #     inlineScript: |
-    #       az account show
-    #       az configure --defaults group=${{ env.AZURE_RESOURCE_GROUP }} location=westus2
-    #       az container create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_NAP_NAME }} --image '${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}' --dns-name-label ${{ env.AZURE_NAP_NAME }} --registry-login-server ${{ secrets.REGISTRY_SERVERNAME }} --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --ports 80
-
-      # Deploy ARM template
-    - name: Run ARM deploy
+    - name: Run ARM template deploy
       uses: azure/arm-deploy@v1
       with:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
