@@ -6,3 +6,5 @@
 10038	IGNORE	(Content Security Policy (CSP) Header Not Set)
 10202	IGNORE	(Absence of Anti-CSRF Tokens)
 20012	IGNORE	(Anti-CSRF Tokens Check)
+40035	IGNORE	(Hidden File Found)
+43	IGNORE	(Source Code Disclosure - File Inclusion)
