@@ -23,7 +23,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
       name: Code Checkout
@@ -88,7 +87,11 @@ jobs:
         cd DotNetCoreWebApp
         docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
-  
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
     - uses: Azure/container-scan@v0.1
       name: GitHub Container Scan
       with:
