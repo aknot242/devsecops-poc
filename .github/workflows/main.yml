@@ -18,17 +18,18 @@ env:
   AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
   AZURE_NAP_NAME: edgar-nap-devsecopspocappcontainer
   ACR_NAME: aknot242
-  SITE_NAME: edgar-devsecopspoc
+  SITE_NAME_STAGING: edgar-devsecopspoc-staging
+  SITE_NAME_PROD: edgar-devsecopspoc
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      name: Code Checkout
+    - name: Code Checkout
+      uses: actions/checkout@v2
 
-    - uses: actions/setup-dotnet@v1
-      name: DotNet Build
+    - name: DotNet Build
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x'
     - run: dotnet build -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build   
@@ -64,13 +65,13 @@ jobs:
     #     name: anchore-vulnerabilities
     #     path: vulnerabilities.json
 
-    - uses: azure/login@v1
-      name: Az Login
+    - name: Az Login
+      uses: azure/login@v1
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - uses: azure/docker-login@v1
-      name: ACR Login
+    - name: ACR Login
+      uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_SERVERNAME }}
         username: ${{ secrets.REGISTRY_USERNAME }}
@@ -87,13 +88,9 @@ jobs:
         cd DotNetCoreWebApp
         docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
 
-    - uses: Azure/container-scan@v0.1
-      name: GitHub Container Scan
+    - name: GitHub Container Scan
+      uses: Azure/container-scan@v0.1
       with:
         image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
@@ -103,14 +100,42 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME }}
+        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_STAGING }}
 
     - name: OWASP ZAP Scan
       uses: zaproxy/action-full-scan@v0.2.0
       with:
-        target: "http://${{ env.SITE_NAME }}.westus2.azurecontainer.io/"
+        target: "http://${{ env.SITE_NAME_STAGING }}.westus2.azurecontainer.io/"
         rules_file_name: '.github/zap/rules.tsv'
         fail_action: true
+
+    - name: Azure logout
+      run: |
+        az logout
+
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Az Login
+      uses: azure/login@v1
+      with:
+       creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: ACR Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_SERVERNAME }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Run ARM template deploy
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+        template: ./azuredeploy.json
+        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_PROD }}
 
     - name: Azure logout
       run: |
