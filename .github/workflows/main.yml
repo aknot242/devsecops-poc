@@ -18,6 +18,8 @@ env:
   AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
   AZURE_NAP_NAME: edgar-nap-devsecopspocappcontainer
   ACR_NAME: aknot242
+  CONTAINER_GROUP_STAGING: edgar-devsecopspoc-staging
+  CONTAINER_GROUP_PROD: edgar-devsecopspoc-prod
   SITE_NAME_STAGING: edgar-devsecopspoc-staging
   SITE_NAME_PROD: edgar-devsecopspoc
 
@@ -101,7 +103,7 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_STAGING }}
+        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_STAGING }} containerGroupName=${{ env.CONTAINER_GROUP_STAGING }}
 
     - name: OWASP ZAP Scan
       uses: zaproxy/action-full-scan@v0.2.0
@@ -140,7 +142,7 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_PROD }}
+        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_PROD }} containerGroupName=${{ env.CONTAINER_GROUP_PROD }}
 
     - name: Azure logout
       run: |

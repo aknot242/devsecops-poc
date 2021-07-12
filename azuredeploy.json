@@ -4,7 +4,7 @@
     "parameters": {
         "containerGroupName": {
             "type": "string",
-            "defaultValue": "edgar-devsecopspoc-container-group",
+            "defaultValue": "edgar-devsecopspoc",
             "metadata": {
                 "description": "Edgar DevSecOps POC container group"
             }
@@ -12,7 +12,7 @@
         "siteName": {
             "type": "string",
             "metadata": {
-                "description": "The site name, the first segment of the WordPress site FQDN (e.g. mywordpress.westus.azurecontainer.io)"
+                "description": "The site name, the first segment of the FQDN (e.g. mywordpress.westus.azurecontainer.io)"
             }
         },
         "imageRegistryLoginServer": {
@@ -24,16 +24,26 @@
         "imageRegistryPassword": {
             "type": "string"
         },
+        "container1Name": {
+            "type": "string",
+            "defaultValue": "dotnetcorewebapp",
+            "metadata": {
+                "description": "Name of the container for the app"
+            }
+        },
         "container1Image": {
             "type": "string"
+        },
+        "container2Name": {
+            "type": "string",
+            "defaultValue": "nap-dotnetcorewebapp",
+            "metadata": {
+                "description": "Name of the container for the app"
+            }
         },
         "container2Image": {
             "type": "string"
         }
-    },
-    "variables": {
-        "container1Name": "dotnetcorewebapp",
-        "container2Name": "nap-dotnetcorewebapp"
     },
     "resources": [
         {
@@ -44,7 +54,7 @@
             "properties": {
                 "containers": [
                     {
-                        "name": "[variables('container1Name')]",
+                        "name": "[parameters('container1Name')]",
                         "properties": {
                             "image": "[parameters('container1Image')]",
                             "resources": {
@@ -61,7 +71,7 @@
                         }
                     },
                     {
-                        "name": "[variables('container2Name')]",
+                        "name": "[parameters('container2Name')]",
                         "properties": {
                             "image": "[parameters('container2Image')]",
                             "resources": {
