@@ -80,6 +80,37 @@ jobs:
         template: ./azuredeploy.json
         parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_STAGING }} containerGroupName=${{ env.CONTAINER_GROUP_STAGING }}
 
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+
+    - name: Install SeleniumBase
+      run: |
+        pip install seleniumbase
+
+    - name: Install Chrome and Firefox
+      run: |
+        sudo apt install google-chrome-stable
+        sudo apt-get install firefox
+
+    - name: Install chromedriver and geckodriver (Firefox Webdriver)
+      run: |
+        seleniumbase install chromedriver
+        seleniumbase install geckodriver
+
+    - name: Run pytest selenium/full-test.py --browser=chrome --headless
+      run: |
+        pytest selenium/full-test.py --browser=chrome --headless -v -s --junit-xml=junit/test-results.xml
+
+    - name: Run pytest selenium/full-test.py --browser=firefox --headless
+      run: |
+        pytest selenium/full-test.py --browser=firefox --headless -v -s --junit-xml=junit/test-results.xml
+
     - name: OWASP ZAP Scan
       uses: zaproxy/action-full-scan@v0.2.0
       with:
