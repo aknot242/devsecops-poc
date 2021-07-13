@@ -14,6 +14,7 @@ on:
   workflow_dispatch:
 
 env:
+  PY_COLORS: "1"
   AZURE_RESOURCE_GROUP: edgar-rg
   AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
   AZURE_NAP_NAME: edgar-nap-devsecopspocappcontainer
@@ -42,32 +43,6 @@ jobs:
         pwd
         dotnet publish -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build
     
-    # Performs an Anchore container image vulnerability and compliance scan, 
-    # and integrates the results with GitHub Advanced Security code scanning feature.
-    # For more information on the Anchore scan action usage and parameters, see
-    # https://github.com/anchore/scan-action.  For more information on
-    # Anchore container image scanning in general, see
-    # https://docs.anchore.com.
-    # - name: Build the Docker image locally for Anchore Container Scan
-    #   run:  |
-    #     cd DotNetCoreWebApp
-    #     docker build --file Dockerfile --tag devsecops/pocimage:latest .
-    #     docker images
-    
-    # - name: Run the local Anchore scan action itself with GitHub Advanced Security code scanning integration enabled
-    #   uses: anchore/scan-action@v2
-    #   with:
-    #     image: "devsecops/pocimage:latest"
-    #     fail-build: true
-    #     severity-cutoff: medium
-    
-    # - name: Upload Artifact
-    #   if: ${{ always() }}
-    #   uses: actions/upload-artifact@v2.2.0
-    #   with:
-    #     name: anchore-vulnerabilities
-    #     path: vulnerabilities.json
-
     - name: Az Login
       uses: azure/login@v1
       with:
