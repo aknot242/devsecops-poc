@@ -12,7 +12,9 @@
 - [Blog post link](https://www.ais.com/devsecops-with-github-actions/)
 
 
-#### Build NAP Container and push to ACR
+#### Build NAP WAF + DoS Container and push to ACR
 ``` bash
-az acr build --image nginx-app-protect:3.2 --registry aknot242.azurecr.io --file Dockerfile .
+cd app-protect
+az login
+az acr build --image nginx-app-protect-waf-dos:3.3 --registry aknot242 --file Base-Dockerfile .
 ```
