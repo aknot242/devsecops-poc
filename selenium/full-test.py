@@ -130,4 +130,3 @@ class MyTestClass(BaseCase):
         # 8. For the full method list, see one of the following:
         #    * SeleniumBase/seleniumbase/fixtures/base_case.py
         #    * SeleniumBase/help_docs/method_summary.md
-{"mode":"full","isActive":false}
