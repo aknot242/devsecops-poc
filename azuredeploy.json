@@ -94,7 +94,7 @@
                 "osType": "Linux",
                 "ipAddress": {
                     "dnsNameLabel": "[parameters('siteName')]",
-                    "type": "Public",
+                    "type": "Private",
                     "ports": [
                         {
                             "protocol": "tcp",
