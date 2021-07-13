@@ -94,7 +94,7 @@
                 "osType": "Linux",
                 "ipAddress": {
                     "dnsNameLabel": "[parameters('siteName')]",
-                    "type": "Private",
+                    "type": "Public",
                     "ports": [
                         {
                             "protocol": "tcp",
@@ -105,9 +105,6 @@
                             "port": 443
                         }
                     ]
-                },
-                "networkProfile": {
-                    "id": "/subscriptions/77c6ebef-d849-4527-a355-742d8d7d3fdc/resourceGroups/edgar-rg/providers/Microsoft.Network/networkProfiles/aci-network-profile-edgar-rg-vnet-aci-container-subnet"
                 },
                 "imageRegistryCredentials": [
                     {
