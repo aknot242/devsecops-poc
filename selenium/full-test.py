@@ -9,7 +9,7 @@ class MyTestClass(BaseCase):
         # self.click('input[value="Search"]')
         # self.assert_text("xkcd: volume 0", "h3")
         # self.open("https://xkcd.com/353/")
-        self.assert_title("Home page: DotNetCoreWebApp")
+        self.assert_title("Home page - DotNetCoreWebApp")
         # self.assert_element('img[alt="Python"]')
         # self.click('a[rel="license"]')
         # self.assert_text("free to copy and reuse")
