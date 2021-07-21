@@ -7,5 +7,8 @@ COPY log-elk.json log-all.json log-json.json waf-policy.json /etc/app_protect/co
 EXPOSE 80
 EXPOSE 443
 
+COPY register-deploy.sh  /root/
+RUN ["chmod", "+x", "/root/register-deploy.sh"]
+
 COPY entrypoint.sh  /root/
 CMD ["sh", "/root/entrypoint.sh"]
