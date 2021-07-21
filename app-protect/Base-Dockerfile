@@ -19,8 +19,8 @@ RUN printf "deb https://pkgs.nginx.com/app-protect/debian `lsb_release -cs` ngin
 # Download the apt configuration to `/etc/apt/apt.conf.d`:
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
 
-# Update the repository and install the most recent version of the NGINX App Protect DoS and NGINX App Protect package (which includes NGINX Plus):
-RUN apt-get update && apt-get install -y app-protect-dos app-protect
+# Update the repository and install various tools and the most recent version of the NGINX App Protect DoS and NGINX App Protect package (which includes NGINX Plus):
+RUN apt-get update && apt-get install -y vim netcat procps curl jq app-protect-dos app-protect
 
 # Remove nginx repository key/cert from docker
 RUN rm -rf /etc/ssl/nginx
