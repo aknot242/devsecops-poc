@@ -18,6 +18,8 @@ env:
   AZURE_RESOURCE_GROUP: edgar-rg
   ACR_NAME: aknot242
   AKS_CLUSTER_NAME: edgar-aks-cluster
+  NAMESPACE_STAGE: devsecops-stage
+  NAMESPACE_PROD: devsecops-prod
 
 jobs:
   build:
@@ -76,9 +78,11 @@ jobs:
 
     - uses: Azure/k8s-deploy@v1.4
       with:
+        namespace: '${{ env.NAMESPACE_STAGE }}'
         manifests: |
           manifests/deployment.yml
           manifests/service.yml
+          manifests/ingress.yml
         images: |
           ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
           aknot242.azurecr.io/dotnetcorewebapp:${{ github.sha }}
