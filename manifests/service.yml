@@ -5,6 +5,14 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 80
+    - name: app
+      port: 80
+      protocol: TCP
+    - name: probe
+      port: 8090
+      protocol: TCP
+    - name: probe500
+      port: 8091
+      protocol: TCP
   selector:
     app: devsecops-poc
