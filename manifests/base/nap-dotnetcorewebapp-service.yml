@@ -48,7 +48,7 @@ spec:
             periodSeconds: 10
           env:
             - name: APP_FQDN
-              value: dotnetcorewebapp.devsecops-stage.svc.cluster.local
+              value: localhost
 
 ---
 apiVersion: v1

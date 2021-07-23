@@ -1,0 +1,8 @@
+nameSuffix: -prod
+commonLabels:
+  variant: prod
+bases:
+  - ../../base
+patchesStrategicMerge:
+  - nap-dotnetcorewebapp-service.yml
+  - ingress.yml

@@ -69,20 +69,26 @@ jobs:
       with:
         image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
-    # Set the target AKS cluster.
-    - uses: Azure/aks-set-context@v1
+    - name: Set the target AKS cluster.
+      uses: Azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: ${{ env.AKS_CLUSTER_NAME }}
         resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
+    - name: Bake manifests for stage deployment
+      uses: azure/k8s-bake@v1
+      with:
+        renderEngine: 'kustomize'
+        kustomizationPath: './manifests/overlays/stage/'
+        kubectl-version: 'latest'
+      id: stagebake
+
+    - name: Deploy to AKS
     - uses: Azure/k8s-deploy@v1.4
       with:
         namespace: '${{ env.NAMESPACE_STAGE }}'
-        manifests: |
-          manifests/dotnetcorewebapp-service.yml
-          manifests/nap-dotnetcorewebapp-service.yml
-          manifests/ingress.yml
+        manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
         images: |
           ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
           aknot242.azurecr.io/dotnetcorewebapp:${{ github.sha }}

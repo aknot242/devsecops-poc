@@ -1,0 +1,8 @@
+nameSuffix: -stage
+commonLabels:
+  variant: stage
+bases:
+  - ../../base
+patchesStrategicMerge:
+  - nap-dotnetcorewebapp-service.yml
+  - ingress.yml
