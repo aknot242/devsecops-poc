@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: devsecops-poc-stage
+  name: devsecops-poc
 spec:
   rules:
     - host: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
