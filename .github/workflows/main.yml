@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - main
-    ignore-tags:
+    tags-ignore:
       - "*"
   workflow_dispatch:
 
@@ -18,8 +18,7 @@ env:
   AZURE_RESOURCE_GROUP: edgar-rg
   ACR_NAME: aknot242
   AKS_CLUSTER_NAME: edgar-aks-cluster
-  NAMESPACE_STAGE: devsecops-stage
-  NAMESPACE_PROD: devsecops-prod
+  SITE_URL_STAGING: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
 
 jobs:
   build:
@@ -86,11 +85,10 @@ jobs:
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
-          namespace: "${{ env.NAMESPACE_STAGE }}"
           manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
           images: |
             ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
-            aknot242.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
 
       # - name: Selenium - Set up Python 3.9
       #   uses: actions/setup-python@v1
@@ -126,23 +124,48 @@ jobs:
       # - name: DAST - OWASP ZAP Scan
       #   uses: zaproxy/action-full-scan@v0.2.0
       #   with:
-      #     target: "http://${{ env.SITE_NAME_STAGING }}.westus2.azurecontainer.io/"
+      #     target: "http://${{ env.SITE_URL_STAGING }}/"
       #     rules_file_name: '.github/zap/rules.tsv'
       #     fail_action: true
 
       - name: Azure logout
         run: |
           az logout
-  # deploy-prod:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Code Checkout
-  #     uses: actions/checkout@v2
-  #   - name: Azure Login
-  #     uses: azure/login@v1
-  #     with:
-  #      creds: ${{ secrets.AZURE_CREDENTIALS }}
-  #   - name: Azure logout
-  #     run: |
-  #       az logout
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set the target AKS cluster.
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
+
+      - name: Bake manifests for prod deployment
+        uses: azure/k8s-bake@v1
+        with:
+          renderEngine: "kustomize"
+          kustomizationPath: "./manifests/overlays/prod/"
+          kubectl-version: "latest"
+        id: prodbake
+
+      - name: Deploy to AKS
+        uses: Azure/k8s-deploy@v1.4
+        with:
+          manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
+          images: |
+            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Azure logout
+        run: |
+          az logout
