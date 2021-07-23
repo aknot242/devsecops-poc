@@ -5,3 +5,12 @@ metadata:
 spec:
   rules:
     - host: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nap-dotnetcorewebapp
+                port:
+                  number: 80
