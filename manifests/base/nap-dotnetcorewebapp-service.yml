@@ -51,6 +51,8 @@ spec:
               value: localhost
             - name: PROXY_FQDN
               value: localhost
+            - name: PROXY_NAME
+              value: devsecops
 
 ---
 apiVersion: v1

@@ -13,3 +13,5 @@ spec:
               value: dotnetcorewebapp-prod.devsecops-prod.svc.cluster.local
             - name: PROXY_FQDN
               value: devsecops-poc-prod.28d5d6771fc84adba80b.westus2.aksapp.io
+            - name: PROXY_NAME
+              value: devsecops-prod

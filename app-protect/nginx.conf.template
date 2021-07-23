@@ -42,6 +42,7 @@ http {
         app_protect_security_log_enable on; # This section enables the logging capability
         app_protect_security_log "/etc/app_protect/conf/log-all.json" /var/log/app_protect/security.log;
         app_protect_security_log "/etc/app_protect/conf/log-elk.json" syslog:server=172.19.0.4:5144; # This is where the remote logger is defined in terms of: logging options (defined in the referenced file), log server IP, log server port
+        app_protect_dos_enable off;
 
 
         location / {
@@ -49,7 +50,7 @@ http {
             access_log syslog:server=172.19.0.4:5561 log_dos if=$loggable;
             app_protect_dos_enable on;
             app_protect_dos_policy_file "/etc/app_protect_dos/BADOSDefaultPolicy.json";
-            app_protect_dos_name "${PROXY_FQDN}";
+            app_protect_dos_name "${PROXY_NAME}";
             app_protect_dos_security_log_enable on;
             app_protect_dos_security_log "/etc/app_protect_dos/log-default.json" syslog:server=172.19.0.4:5261;
 
