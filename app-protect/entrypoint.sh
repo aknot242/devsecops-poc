@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # push env var values into template and create nginx.conf
-envsubst '${APP_FQDN} ${APP_FQDN}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+envsubst '${APP_FQDN} ${APP_FQDN} ${PROXY_FQDN} ${PROXY_FQDN}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 # Call script to register deployment with Elasticsearch
 /bin/bash /root/register-deploy.sh
