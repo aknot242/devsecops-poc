@@ -41,14 +41,14 @@ http {
         app_protect_policy_file "/etc/app_protect/conf/waf-policy.json"; # This is a reference to the policy file to use. If not defined, the default policy is used
         app_protect_security_log_enable on; # This section enables the logging capability
         app_protect_security_log "/etc/app_protect/conf/log-all.json" /var/log/app_protect/security.log;
-        app_protect_security_log "/etc/app_protect/conf/log-elk.json" syslog:server=20.94.245.199:5144; # This is where the remote logger is defined in terms of: logging options (defined in the referenced file), log server IP, log server port
+        app_protect_security_log "/etc/app_protect/conf/log-elk.json" syslog:server=edgar-docker.westus2.cloudapp.azure.com:5144; # This is where the remote logger is defined in terms of: logging options (defined in the referenced file), log server IP, log server port
 
         app_protect_dos_security_log_enable on;
-        app_protect_dos_security_log "/etc/app_protect_dos/log-default.json" syslog:server=20.94.245.199:5261;
+        app_protect_dos_security_log "/etc/app_protect_dos/log-default.json" syslog:server=edgar-docker.westus2.cloudapp.azure.com:5261;
 
         location / {
             set $loggable '0';
-            access_log syslog:server=20.94.245.199:5561 log_dos if=$loggable;
+            access_log syslog:server=edgar-docker.westus2.cloudapp.azure.com:5561 log_dos if=$loggable;
             app_protect_dos_enable on;
             app_protect_dos_policy_file "/etc/app_protect_dos/BADOSDefaultPolicy.json";
             app_protect_dos_name example.com/;
