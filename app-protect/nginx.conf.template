@@ -25,13 +25,13 @@ http {
     # real_ip_recursive on;
     app_protect_dos_liveness on;
     app_protect_dos_readiness on;
+    resolver 10.0.0.10 valid=30s; # azure aks cluster dns server
 
     server {
         listen 80;
         # real_ip_header X-Forwarded-For;
         server_name edgar-devsecopspoc.westus2.azurecontainer.io;
         proxy_http_version 1.1;
-        resolver 168.63.129.16; # azure container private dns server
 
         add_header X-Frame-Options "SAMEORIGIN";
         add_header X-Content-Type-Options "nosniff" always;
@@ -58,7 +58,7 @@ http {
             }
             client_max_body_size 0;
             default_type text/html;
-            proxy_pass http://dotnetcorewebapp:3000$request_uri;
+            proxy_pass http://${APP_FQDN}:3000$request_uri;
         }
     }
 
