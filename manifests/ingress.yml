@@ -13,6 +13,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: svc-devsecops-poc
+                name: nap-dotnetcorewebapp
                 port:
                   number: 80

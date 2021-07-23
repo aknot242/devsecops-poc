@@ -80,8 +80,8 @@ jobs:
       with:
         namespace: '${{ env.NAMESPACE_STAGE }}'
         manifests: |
-          manifests/deployment.yml
-          manifests/service.yml
+          manifests/dotnetcorewebapp-service.yml
+          manifests/nap-dotnetcorewebapp-service.yml
           manifests/ingress.yml
         images: |
           ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
