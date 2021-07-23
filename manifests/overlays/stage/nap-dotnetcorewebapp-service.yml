@@ -1,0 +1,15 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nap-dotnetcorewebapp
+spec:
+  template:
+    spec:
+      containers:
+        - name: nap-dotnetcorewebapp
+          env:
+            - name: APP_FQDN
+              value: dotnetcorewebapp-stage.devsecops-stage.svc.cluster.local
+            - name: PROXY_FQDN
+              value: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io

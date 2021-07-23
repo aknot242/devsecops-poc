@@ -4,3 +4,4 @@
 *.crt
 *.key
 report_*
+.DS_Store

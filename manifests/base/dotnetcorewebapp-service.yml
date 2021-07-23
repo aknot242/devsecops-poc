@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnetcorewebapp
+  labels:
+    app: dotnetcorewebapp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: dotnetcorewebapp
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: dotnetcorewebapp
+    spec:
+      containers:
+        - name: dotnetcorewebapp
+          image: aknot242.azurecr.io/dotnetcorewebapp
+          ports:
+            - containerPort: 3000
+              name: web
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetcorewebapp
+spec:
+  type: ClusterIP
+  ports:
+    - name: app
+      port: 3000
+      protocol: TCP
+  selector:
+    app: dotnetcorewebapp

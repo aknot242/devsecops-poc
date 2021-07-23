@@ -15,5 +15,5 @@
 ``` bash
 cd app-protect
 az login
-az acr build --image nginx-app-protect-waf-dos:3.3 --registry aknot242 --file Base-Dockerfile .
+az acr build -t nginx-app-protect-waf-dos:3.3 -t nginx-app-protect-waf-dos:latest -r aknot242 -f Base-Dockerfile .
 ```

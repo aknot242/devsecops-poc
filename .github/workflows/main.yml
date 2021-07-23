@@ -9,147 +9,168 @@ on:
   push:
     branches:
       - main
-    ignore-tags:
+    tags-ignore:
       - "*"
   workflow_dispatch:
 
 env:
   PY_COLORS: "1"
   AZURE_RESOURCE_GROUP: edgar-rg
-  AZURE_WEBAPP_NAME: edgar-devsecopspocappcontainer
-  AZURE_NAP_NAME: edgar-nap-devsecopspocappcontainer
   ACR_NAME: aknot242
-  CONTAINER_GROUP_STAGING: edgar-devsecopspoc-staging
-  CONTAINER_GROUP_PROD: edgar-devsecopspoc-prod
-  SITE_NAME_STAGING: edgar-devsecopspoc-staging
-  SITE_NAME_PROD: edgar-devsecopspoc
+  AKS_CLUSTER_NAME: edgar-aks-cluster
+  NAMESPACE_STAGE: devsecops-stage
+  NAMESPACE_PROD: devsecops-prod
+  SITE_URL_STAGING: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
 
-    - name: Code Checkout
-      uses: actions/checkout@v2
+      - name: DotNet Build
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+      - run: dotnet build -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build
 
-    - name: DotNet Build
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - run: dotnet build -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build   
+      - name: DotNet Publish
+        run: |
+          pwd
+          dotnet publish -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build
 
-    - name: DotNet Publish
-      run: |
-        pwd
-        dotnet publish -c Release DotNetCoreWebApp/DotNetCoreWebApp.csproj -o {env.DOTNET_ROOT}/app/build
-    
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-       creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Azure Container Registry Login
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.REGISTRY_SERVERNAME }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and push App Protect container
-      run: |
-        cd app-protect
-        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -f NAP-App-Dockerfile .
-        docker push ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
+      - name: Azure Container Registry Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_SERVERNAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: Build and push DotNet app container
-      run: |
-        cd DotNetCoreWebApp
-        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} .
-        docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
+      - name: Build and push App Protect container
+        run: |
+          cd app-protect
+          docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:latest -f NAP-App-Dockerfile .
+          docker push ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
 
-    - name: GitHub Container Scan using Trivy and Dockle
-      uses: Azure/container-scan@v0.1
-      with:
-        image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
+      - name: Build and push DotNet app container
+        run: |
+          cd DotNetCoreWebApp
+          docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest .
+          docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
-    - name: Run ARM template deploy to Staging
-      uses: azure/arm-deploy@v1
-      with:
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-        template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_STAGING }} containerGroupName=${{ env.CONTAINER_GROUP_STAGING }}
+      - name: GitHub Container Scan using Trivy and Dockle
+        uses: Azure/container-scan@v0.1
+        with:
+          image-name: ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
-    - name: Selenium - Set up Python 3.9
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.9
+      - name: Set the target AKS cluster.
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
-    - name: Selenium - Install dependencies
-      run: |
-        python -m pip install --upgrade pip
+      - name: Bake manifests for stage deployment
+        uses: azure/k8s-bake@v1
+        with:
+          renderEngine: "kustomize"
+          kustomizationPath: "./manifests/overlays/stage/"
+          kubectl-version: "latest"
+        id: stagebake
 
-    - name: Selenium - Install SeleniumBase
-      run: |
-        pip install seleniumbase
+      - name: Deploy to AKS
+        uses: Azure/k8s-deploy@v1.4
+        with:
+          namespace: "${{ env.NAMESPACE_STAGE }}"
+          manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
+          images: |
+            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
 
-    - name: Selenium - Install Chrome and Firefox
-      run: |
-        sudo apt install google-chrome-stable
-        sudo apt-get install firefox
+      - name: Selenium - Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
 
-    - name: Selenium - Install chromedriver and geckodriver (Firefox Webdriver)
-      run: |
-        seleniumbase install chromedriver
-        seleniumbase install geckodriver
+      - name: Selenium - Install dependencies
+        run: |
+          python -m pip install --upgrade pip
 
-    - name: Selenium - Run Chrome Selenium tests
-      run: |
-        pytest selenium/full-test.py --browser=chrome --headless -v -s --junit-xml=junit/test-results.xml
+      - name: Selenium - Install SeleniumBase
+        run: |
+          pip install seleniumbase
 
-    - name: Selenium - Run Firefox Selenium tests
-      run: |
-        pytest selenium/full-test.py --browser=firefox --headless -v -s --junit-xml=junit/test-results.xml
+      - name: Selenium - Install Chrome and Firefox
+        run: |
+          sudo apt install google-chrome-stable
+          sudo apt-get install firefox
 
-    - name: DAST - OWASP ZAP Scan
-      uses: zaproxy/action-full-scan@v0.2.0
-      with:
-        target: "http://${{ env.SITE_NAME_STAGING }}.westus2.azurecontainer.io/"
-        rules_file_name: '.github/zap/rules.tsv'
-        fail_action: true
+      - name: Selenium - Install chromedriver and geckodriver (Firefox Webdriver)
+        run: |
+          seleniumbase install chromedriver
+          seleniumbase install geckodriver
 
-    - name: Azure logout
-      run: |
-        az logout
+      - name: Selenium - Run Chrome Selenium tests
+        run: |
+          pytest selenium/full-test.py --browser=chrome --headless -v -s --junit-xml=junit/test-results.xml
+
+      - name: Selenium - Run Firefox Selenium tests
+        run: |
+          pytest selenium/full-test.py --browser=firefox --headless -v -s --junit-xml=junit/test-results.xml
+
+      - name: DAST - OWASP ZAP Scan
+        uses: zaproxy/action-full-scan@v0.2.0
+        with:
+          target: "http://${{ env.SITE_URL_STAGING }}/"
+          rules_file_name: ".github/zap/rules.tsv"
+          fail_action: true
+
+      - name: Azure logout
+        run: |
+          az logout
 
   deploy-prod:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
 
-    - name: Code Checkout
-      uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-       creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Azure Container Repository Login
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.REGISTRY_SERVERNAME }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Set the target AKS cluster.
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
-    - name: Run ARM template deploy to Prod
-      uses: azure/arm-deploy@v1
-      with:
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-        template: ./azuredeploy.json
-        parameters: imageRegistryLoginServer=${{ secrets.REGISTRY_SERVERNAME }} imageRegistryUsername=${{ secrets.REGISTRY_USERNAME }} imageRegistryPassword=${{ secrets.REGISTRY_PASSWORD }} container1Image=${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} container2Image=${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} siteName=${{ env.SITE_NAME_PROD }} containerGroupName=${{ env.CONTAINER_GROUP_PROD }}
+      - name: Bake manifests for prod deployment
+        uses: azure/k8s-bake@v1
+        with:
+          renderEngine: "kustomize"
+          kustomizationPath: "./manifests/overlays/prod/"
+          kubectl-version: "latest"
+        id: prodbake
 
-    - name: Azure logout
-      run: |
-        az logout
+      - name: Deploy to AKS
+        uses: Azure/k8s-deploy@v1.4
+        with:
+          namespace: "${{ env.NAMESPACE_PROD }}"
+          manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
+          images: |
+            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Azure logout
+        run: |
+          az logout

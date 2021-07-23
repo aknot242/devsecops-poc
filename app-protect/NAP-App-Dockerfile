@@ -1,7 +1,7 @@
 # Copy configuration files into final container
 FROM aknot242.azurecr.io/nginx-app-protect-waf-dos:3.3
 
-COPY nginx.conf /etc/nginx/
+COPY nginx.conf.template /etc/nginx/
 COPY log-elk.json log-all.json log-json.json waf-policy.json /etc/app_protect/conf/
 
 EXPOSE 80
