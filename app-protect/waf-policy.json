@@ -1,6 +1,6 @@
 {
     "policy": {
-        "name": "user_defined_single_signature",
+        "name": "devsecops",
         "template": {
             "name": "POLICY_TEMPLATE_NGINX_BASE"
         },
@@ -12,6 +12,24 @@
                 "responseHeader": "HTTP/1.1 400 Bad Request\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close",
                 "responseActionType": "custom",
                 "responsePageType": "default"
+            }
+        ],
+        "general": {
+            "trustXff": true,
+            "allowedResponseCodes": [
+                400,
+                401,
+                403,
+                404,
+                502,
+                499,
+                413
+            ]
+        },
+        "signatures": [
+            {
+                "signatureId": 200021132,
+                "enabled": false
             }
         ]
     }
