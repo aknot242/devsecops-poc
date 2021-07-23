@@ -10,4 +10,4 @@ spec:
         - name: nap-dotnetcorewebapp
           env:
             - name: APP_FQDN
-              value: dotnetcorewebapp.devsecops-prod.svc.cluster.local
+              value: dotnetcorewebapp-prod.devsecops-prod.svc.cluster.local
