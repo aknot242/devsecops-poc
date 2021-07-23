@@ -55,13 +55,13 @@ jobs:
     - name: Build and push App Protect container
       run: |
         cd app-protect
-        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -f NAP-App-Dockerfile .
+        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:latest -f NAP-App-Dockerfile .
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
 
     - name: Build and push DotNet app container
       run: |
         cd DotNetCoreWebApp
-        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} .
+        docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:latest .
         docker push ${{ secrets.REGISTRY_SERVERNAME }}/dotnetcorewebapp:${{ github.sha }}
 
     - name: GitHub Container Scan using Trivy and Dockle
