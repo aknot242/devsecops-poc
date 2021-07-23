@@ -18,6 +18,8 @@ env:
   AZURE_RESOURCE_GROUP: edgar-rg
   ACR_NAME: aknot242
   AKS_CLUSTER_NAME: edgar-aks-cluster
+  NAMESPACE_STAGE: devsecops-stage
+  NAMESPACE_PROD: devsecops-prod
   SITE_URL_STAGING: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
 
 jobs:
@@ -85,6 +87,7 @@ jobs:
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
+          namespace: "${{ env.NAMESPACE_STAGE }}"
           manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
           images: |
             ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
@@ -161,6 +164,7 @@ jobs:
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
+          namespace: "${{ env.NAMESPACE_PROD }}"
           manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
           images: |
             ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
