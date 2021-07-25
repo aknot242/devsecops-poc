@@ -31,6 +31,19 @@
                 "signatureId": 200021132,
                 "enabled": false
             }
-        ]
+        ],
+        "bot-defense": {
+            "settings": {
+                "isEnabled": true
+            },
+            "mitigations": {
+                "signatures": [
+                    {
+                        "action": "ignore",
+                        "name": "ab"
+                    }
+                ]
+            }
+        }
     }
 }
