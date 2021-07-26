@@ -22,7 +22,7 @@ namespace DotNetCoreWebApp.Pages
 
         public void OnGet()
         {
-
+            System.Threading.Thread.Sleep(1000);
         }
     }
 }
