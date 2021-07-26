@@ -1,0 +1,16 @@
+﻿@page
+@model SlowModel
+@{
+    ViewData["Title"] = "Slow page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to DevSecOps</h1>
+    <p>This is a slow page. It took @Model.LoadTime ms to load.</p>
+</div>
+
+
+@* @if (!string.IsNullOrEmpty(@Model.SearchString))
+{
+    <div class="text-center">Search result: @Html.Raw(@Model.SearchString)</div>
+} *@
