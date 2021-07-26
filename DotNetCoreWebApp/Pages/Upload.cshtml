@@ -1,0 +1,31 @@
+﻿@page
+@model UploadModel
+@{
+    ViewData["Title"] = "Image Upload";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to upload an image.</p>
+
+<p>The following form's page handler saves the file to disk.</p>
+
+<form enctype="multipart/form-data" method="post">
+    <dl>
+        <dt>
+            <label asp-for="FileUpload.FormFile"></label>
+        </dt>
+        <dd>
+            <input asp-for="FileUpload.FormFile" type="file" />
+            <span asp-validation-for="FileUpload.FormFile"></span>
+        </dd>
+    </dl>
+    <input asp-page-handler="Upload" type="submit" value="Upload" />
+</form>
+
+<p class="result">
+    @Model.Result
+</p>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
