@@ -26,6 +26,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Job start webhook notification
+        uses: distributhor/workflow-webhook@v2.0.2
+        env:
+          webhook_url: ${{ secrets.PENDING_WEBHOOK_URL }}
+          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+        if: ${{ always() }}
+
       - name: Code Checkout
         uses: actions/checkout@v2
 
@@ -130,6 +138,20 @@ jobs:
           target: "http://${{ env.SITE_URL_STAGING }}/"
           rules_file_name: ".github/zap/rules.tsv"
           fail_action: true
+
+      - name: Job success webhook notification
+        uses: distributhor/workflow-webhook@v2.0.2
+        env:
+          webhook_url: ${{ secrets.SUCCESS_WEBHOOK_URL }}
+          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+        if: ${{ success() }}
+
+      - name: Job failure webhook notification
+        uses: distributhor/workflow-webhook@v2.0.2
+        env:
+          webhook_url: ${{ secrets.FAILURE_WEBHOOK_URL }}
+          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+        if: ${{ failure() }}
 
       - name: Azure logout
         run: |
