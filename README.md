@@ -55,5 +55,17 @@ chmod +x delete-github-workflow-runs.sh
 ./util/delete-github-workflow-runs.sh <github id>/<repo name>
 ```
 
+#### Troubleshooting Examples
+
+Get a pod id:
+``` bash
+kubectl get pods -n devsecops-stage
+```
+
+SSH into one of the pod ids from the above command:
+``` bash
+kubectl exec --stdin --tty -n devsecops-stage nap-dotnetcorewebapp-stage-84dbbb5bbf-7xffw -- /bin/bash
+```
+
 Original author (@RKSelvi) solution blog:
 - [Blog post link](https://www.ais.com/devsecops-with-github-actions/)
