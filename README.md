@@ -5,7 +5,7 @@
 - .NET code project built as docker container
 - NGINX App Protect WAF and DoS are built into a docker container
 - Containers are deployed to Azure Container Registry
-- Application and APp Protect proxy tiers is deployed to Azure Kubernetes
+- Application and App Protect proxy tiers is deployed to Azure Kubernetes
 - CodeQL - GitHub's new code scanning workflow has been added for code scan
 - Container scanning
 - Selenium tests run
