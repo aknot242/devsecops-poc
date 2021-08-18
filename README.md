@@ -1,13 +1,21 @@
-# DevSecOps - POC for NGINX Sprint Conference, 2021
+# DevSecOps POC
+Forked and adapted from [RKSelvi/devsecops-poc](https://github.com/RKSelvi/devsecops-poc) for NGINX Sprint Conference, 2021.
+
+This repo is intended to demonstrate how to integrate NGINX App Protect WAF and DoS products into a typical DevSecOps workflow leveraging open source tooling.
+
+The repository is featured in the [Automate Application Security with NGINX](https://www.nginx.com/blog/demoing-nginx-at-sprint-2-0/#automate) conference session. A link to the session video will be included here once it airs.
+
+
+## Solution Scope
 
 - GitHub CI/CD has been leveraged for testing DevSecOps pipeline
 - GitHub Actions pipeline has been implemented
 - .NET code project built as docker container
 - NGINX App Protect WAF and DoS are built into a docker container
 - Containers are deployed to Azure Container Registry
-- Application and APp Protect proxy tiers is deployed to Azure Kubernetes
+- Application and App Protect proxy tiers is deployed to Azure Kubernetes
 - CodeQL - GitHub's new code scanning workflow has been added for code scan
-- Container scanning
+- Container linting, package vulnerability scanning
 - Selenium tests run
 - OWASP ZAP DAST scan run
 - Container action has been added
@@ -37,11 +45,13 @@ The following are the high-level tasks needed to be able to run this POC yoursel
 | `WEBHOOK_SECRET`          | Secret used to hash the Webhook POST body             |
 
 
-#### Build NAP WAF + DoS Container and push to ACR
+#### Build NGINX App Protect WAF + DoS Container and push to ACR
+The workflow requires an NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
+
 ``` bash
 cd app-protect
 az login
-az acr build -t nginx-app-protect-waf-dos:3.3 -t nginx-app-protect-waf-dos:latest -r aknot242 -f Base-Dockerfile .
+az acr build -t nginx-app-protect-waf-dos:3.3 -t nginx-app-protect-waf-dos:latest -r <your acr name> -f Base-Dockerfile .
 ```
 
 #### Delete Old GitHub Actions Runs
@@ -57,12 +67,12 @@ chmod +x delete-github-workflow-runs.sh
 
 #### Troubleshooting Examples
 
-Get a pod id:
+Get pod names in a particular namespace:
 ``` bash
 kubectl get pods -n devsecops-stage
 ```
 
-SSH into one of the pod ids from the above command:
+SSH into one of the pods from the above command:
 ``` bash
 kubectl exec --stdin --tty -n devsecops-stage nap-dotnetcorewebapp-stage-84dbbb5bbf-7xffw -- /bin/bash
 ```
