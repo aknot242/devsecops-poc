@@ -3,6 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: devsecops-poc
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
 spec:
   rules:
     - host: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io

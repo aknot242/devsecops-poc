@@ -1,10 +1,6 @@
 # For Debian 10:
 FROM debian:buster
 
-# Download certificate and key from the customer portal (https://my.f5.com)
-# and copy to the build context:
-COPY nginx-repo.crt nginx-repo.key /etc/ssl/nginx/
-
 # Install prerequisite packages:
 RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates wget gnupg2
 
@@ -20,10 +16,9 @@ RUN printf "deb https://pkgs.nginx.com/app-protect/debian `lsb_release -cs` ngin
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
 
 # Update the repository and install various tools and the most recent version of the NGINX App Protect DoS and NGINX App Protect package (which includes NGINX Plus):
-RUN apt-get update && apt-get install -y vim netcat procps curl jq gettext-base app-protect-dos app-protect
-
-# Remove nginx repository key/cert from docker
-RUN rm -rf /etc/ssl/nginx
+RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
+  --mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
+  apt-get update && apt-get install -y vim netcat procps curl jq gettext-base app-protect-dos app-protect
 
 COPY entrypoint.sh  /root/
 
