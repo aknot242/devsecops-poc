@@ -26,11 +26,6 @@
                 413
             ]
         },
-        "methods": [
-            {
-                "name": "STUFF"
-            }
-        ],
         "signatures": [
             {
                 "signatureId": 200021132,
