@@ -52,8 +52,11 @@ The workflow requires an NGINX App Protect WAF + DoS base container to be presen
 
 ``` bash
 cd app-protect
-az login --name <your acr name>.azurecr.io
+az login --use-device-code
+az acr login --name <your acr name>
+
 DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.4 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
+
 docker push <your acr name>.azurecr.io/nginx-app-protect-waf-dos
 ```
 

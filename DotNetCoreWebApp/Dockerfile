@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal AS base
 WORKDIR /app
-RUN apt update && apt-get install -y net-tools curl
+RUN apt update && apt-get install -y net-tools curl && rm -rf /var/lib/apt/lists
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
 WORKDIR /src
 COPY ["DotNetCoreWebApp.csproj", ""]
 RUN dotnet restore "./DotNetCoreWebApp.csproj"
