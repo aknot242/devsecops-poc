@@ -84,6 +84,13 @@ jobs:
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
+      # - name: Set manifest overrides for stage env from GitHub secrets
+      #   uses: microsoft/variable-substitution@v1 
+      #   with:
+      #     files: "./manifests/overlays/stage/ingress.yml"
+      #   env:
+      #     metadata.annotations.nginx.ingress.kubernetes.io/whitelist-source-range: ${{ secrets.IP_ALLOW_LIST_STAGE }}
+
       - name: Bake manifests for stage deployment
         uses: azure/k8s-bake@v1
         with:
@@ -175,6 +182,13 @@ jobs:
           creds: "${{ secrets.AZURE_CREDENTIALS }}"
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
+
+      # - name: Set manifest overrides for prod from GitHub secrets
+      #   uses: microsoft/variable-substitution@v1 
+      #   with:
+      #     files: "./manifests/overlays/prod/ingress.yml"
+      #   env:
+      #     metadata.annotations.nginx.ingress.kubernetes.io/whitelist-source-range: ${{ secrets.IP_ALLOW_LIST_PROD }}
 
       - name: Bake manifests for prod deployment
         uses: azure/k8s-bake@v1

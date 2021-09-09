@@ -42,6 +42,13 @@
                         "action": "ignore",
                         "name": "ab"
                     }
+                ],
+                "anomalies": [
+                    {
+                        "name": "Invalid HTTP Headers",
+                        "action": "block",
+                        "scoreThreshold": 110
+                    }
                 ]
             }
         }

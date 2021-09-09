@@ -4,7 +4,7 @@
     },
     "content": {
         "format": "user-defined",
-        "format_string": "myhostname nginx-app-protect: {\"clientIp\": \"%ip_client%\", \"violations\": \"%violations%\", \"signatureIds\": [%sig_ids%], \"supportId\": \"%support_id%\", \"violationDetails\": \"%violation_details%\" }",
+        "format_string": "myhostname nginx-app-protect: {\"clientIp\": \"%ip_client%\", \"clientClass\": \"%client_class%\", \"violations\": \"%violations%\", \"signatureIds\": [%sig_ids%], \"supportId\": \"%support_id%\", \"violationDetails\": \"%violation_details%\" }",
         "max_request_size": 2000,
         "max_message_size": "10k"
     }

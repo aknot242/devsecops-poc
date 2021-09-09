@@ -43,6 +43,8 @@ The following are the high-level tasks needed to be able to run this POC yoursel
 | `SUCCESS_WEBHOOK_URL`     | Webhook URL to send workflow success events to        |
 | `FAILURE_WEBHOOK_URL`     | Webhook URL to send workflow failure events to        |
 | `WEBHOOK_SECRET`          | Secret used to hash the Webhook POST body             |
+| `IP_ALLOW_LIST_STAGE`           | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **stage** environment.|
+| `IP_ALLOW_LIST_PROD`           | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **prod** environment.|
 
 
 #### Build NGINX App Protect WAF + DoS Container and push to ACR
@@ -50,8 +52,12 @@ The workflow requires an NGINX App Protect WAF + DoS base container to be presen
 
 ``` bash
 cd app-protect
-az login
-az acr build -t nginx-app-protect-waf-dos:3.3 -t nginx-app-protect-waf-dos:latest -r <your acr name> -f Base-Dockerfile .
+az login --use-device-code
+az acr login --name <your acr name>
+
+DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.4 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
+
+docker push <your acr name>.azurecr.io/nginx-app-protect-waf-dos
 ```
 
 #### Delete Old GitHub Actions Runs
