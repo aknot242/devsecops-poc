@@ -54,7 +54,7 @@ http {
             app_protect_dos_security_log_enable on;
             app_protect_dos_security_log "/etc/app_protect_dos/log-default.json" syslog:server=172.19.0.4:5261;
 
-            limit_except GET HEAD POST PROPFIND {
+            limit_except GET HEAD POST {
                 deny all;
             }
             client_max_body_size 0;
