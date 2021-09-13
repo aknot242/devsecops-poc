@@ -83,5 +83,17 @@ SSH into one of the pods from the above command:
 kubectl exec --stdin --tty -n devsecops-stage nap-dotnetcorewebapp-stage-84dbbb5bbf-7xffw -- /bin/bash
 ```
 
+#### Deleting Deployments
+If you need to delete stage and prod deployments, use the following commands:
+
+``` bash
+kubectl delete deployment dotnetcorewebapp-stage -n devsecops-stage
+kubectl delete deployment nap-dotnetcorewebapp-stage -n devsecops-stage
+
+kubectl delete deployment nap-dotnetcorewebapp-prod -n devsecops-prod
+kubectl delete deployment dotnetcorewebapp-prod -n devsecops-prod
+```
+
+
 Original author (@RKSelvi) solution blog:
 - [Blog post link](https://www.ais.com/devsecops-with-github-actions/)
