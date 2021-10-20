@@ -13,7 +13,7 @@ The repository is featured in the [Automate Application Security with NGINX](htt
 - .NET code project built as docker container
 - NGINX App Protect WAF and DoS are built into a docker container
 - Containers are deployed to Azure Container Registry
-- Application and App Protect proxy tiers is deployed to Azure Kubernetes
+- Application and App Protect proxy tiers are deployed to Azure Kubernetes Service
 - CodeQL - GitHub's new code scanning workflow has been added for code scan
 - Container linting, package vulnerability scanning
 - Selenium tests run
@@ -55,7 +55,7 @@ cd app-protect
 az login --use-device-code
 az acr login --name <your acr name>
 
-DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.4 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
+DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.6 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
 
 docker push <your acr name>.azurecr.io/nginx-app-protect-waf-dos
 ```
