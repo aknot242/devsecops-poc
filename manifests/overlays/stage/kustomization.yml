@@ -8,5 +8,5 @@ commonLabels:
 bases:
   - ../../base
 patchesStrategicMerge:
-  - nap-dotnetcorewebapp-service.yml
   - ingress.yml
+  - apdos.yml

@@ -3,8 +3,13 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: devsecops-poc
-  # annotations:
-  #   nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
+  annotations:
+    # nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
+    nginx.org/server-snippets: |
+      add_header X-Frame-Options "SAMEORIGIN";
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header Content-Security-Policy "default-src 'self' http://devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io http://devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
+ 
 spec:
   rules:
     - host: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
@@ -14,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nap-dotnetcorewebapp
+                name: dotnetcorewebapp
                 port:
-                  number: 80
+                  number: 3000

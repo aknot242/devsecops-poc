@@ -47,17 +47,27 @@ The following are the high-level tasks needed to be able to run this POC yoursel
 | `IP_ALLOW_LIST_PROD`           | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **prod** environment.|
 
 
-#### Build NGINX App Protect WAF + DoS Container and push to ACR
-The workflow requires an NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
+#### Build NGINX Ingress Controller + NGINX App Protect WAF + DoS Container and push to ACR
+The workflow requires an NGINX Ingress Controller + NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
 
 ``` bash
 cd app-protect
 az login --use-device-code
 az acr login --name <your acr name>
 
-DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.6 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
+make debian-image-nap-dos-plus PREFIX=<your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos TARGET=download
 
-docker push <your acr name>.azurecr.io/nginx-app-protect-waf-dos
+```
+
+Get the tag from the container built above: `docker image ls <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos`
+
+
+``` bash
+
+docker tag aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:<the tag from above> aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:latest
+
+docker push <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos
+
 ```
 
 #### Delete Old GitHub Actions Runs
@@ -83,14 +93,17 @@ SSH into one of the pods from the above command:
 kubectl exec --stdin --tty -n devsecops-stage nap-dotnetcorewebapp-stage-84dbbb5bbf-7xffw -- /bin/bash
 ```
 
+Show kustomization built configuration for stage environment:
+``` bash
+kustomize build manifests/overlays/stage
+```
+
 #### Deleting Deployments
 If you need to delete stage and prod deployments, use the following commands:
 
 ``` bash
 kubectl delete deployment dotnetcorewebapp-stage -n devsecops-stage
-kubectl delete deployment nap-dotnetcorewebapp-stage -n devsecops-stage
 
-kubectl delete deployment nap-dotnetcorewebapp-prod -n devsecops-prod
 kubectl delete deployment dotnetcorewebapp-prod -n devsecops-prod
 ```
 

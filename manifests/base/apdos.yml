@@ -1,0 +1,44 @@
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: APDosPolicy
+metadata:
+  name: dospolicy
+spec:
+  mitigation_mode: "standard"
+  signatures: "on"
+  bad_actors: "on"
+  automation_tools_detection: "on"
+  tls_fingerprint: "on"
+
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: APDosLogConf
+metadata:
+  name: doslogconf
+spec:
+  content:
+    format: splunk
+    max_message_size: 64k
+  filter:
+    traffic-mitigation-stats: all
+    bad-actors: top 10
+    attack-signatures: top 10
+
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: DosProtectedResource
+metadata:
+  name: dos-protected
+spec:
+  enable: true
+  name: "devsecops"
+  apDosPolicy: "dospolicy"
+  # apDosMonitor:
+  #   uri: "webapp.example.com"
+  #   protocol: "http1"
+  #   timeout: 5
+  dosAccessLogDest: "172.19.0.4:5561"
+  dosSecurityLog:
+    enable: true
+    apDosLogConf: "doslogconf"
+    dosLogDest: "172.19.0.4:5261"

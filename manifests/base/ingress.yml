@@ -1,11 +1,92 @@
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress
+  namespace: nginx-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-ingress
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+      #annotations:
+      #prometheus.io/scrape: "true"
+      #prometheus.io/port: "9113"
+      #prometheus.io/scheme: http
+    spec:
+      serviceAccountName: nginx-ingress
+      containers:
+        - image: nginx-plus-ingress:2.1.0
+          imagePullPolicy: IfNotPresent
+          name: nginx-plus-ingress
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: readiness-port
+              containerPort: 8081
+            - name: prometheus
+              containerPort: 9113
+          readinessProbe:
+            httpGet:
+              path: /nginx-ready
+              port: readiness-port
+            periodSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsUser: 101 #nginx
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          args:
+            - -nginx-plus
+            - -nginx-configmaps=$(POD_NAMESPACE)/nginx-config
+            - -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
+            - -enable-app-protect
+            - -enable-app-protect-dos
+
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: devsecops-poc
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
+    kubernetes.io/ingress.class: "nginx"
+    appprotect.f5.com/app-protect-policy: "default/devsecops"
+    appprotect.f5.com/app-protect-enable: "True"
+    appprotect.f5.com/app-protect-security-log-enable: "True"
+    appprotect.f5.com/app-protect-security-log: "default/log-elk"
+    appprotect.f5.com/app-protect-security-log-destination: "syslog:server=172.19.0.4:5144"
+    nginx.org/server-snippets: |
+      add_header X-Frame-Options "SAMEORIGIN";
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header Content-Security-Policy "default-src 'self' http://devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io http://devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
+    nginx.org/location-snippets: |
+      limit_except GET HEAD POST {
+          deny all;
+      }
+
 spec:
+  # tls:
+  #   - hosts:
+  #       - devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io
+  #     secretName: cafe-secret
   rules:
     - host: devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io
       http:
@@ -14,6 +95,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nap-dotnetcorewebapp
+                name: dotnetcorewebapp
                 port:
-                  number: 80
+                  number: 3000

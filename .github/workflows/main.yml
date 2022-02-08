@@ -60,12 +60,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and push App Protect container
-        run: |
-          cd app-protect
-          docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:latest -f NAP-App-Dockerfile .
-          docker push ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
-
       - name: Build and push DotNet app container
         run: |
           cd DotNetCoreWebApp
@@ -105,7 +99,6 @@ jobs:
           namespace: "${{ env.NAMESPACE_STAGE }}"
           manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
           images: |
-            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
 
       - name: Selenium - Set up Python 3.9
@@ -204,7 +197,6 @@ jobs:
           namespace: "${{ env.NAMESPACE_PROD }}"
           manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
           images: |
-            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
 
       - name: Azure logout

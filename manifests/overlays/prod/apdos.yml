@@ -1,0 +1,8 @@
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: DosProtectedResource
+metadata:
+  name: dos-protected
+spec:
+  enable: true
+  name: "devsecops-prod"
