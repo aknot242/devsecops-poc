@@ -20,7 +20,7 @@ spec:
     spec:
       serviceAccountName: nginx-ingress
       containers:
-        - image: nginx-plus-ingress:2.1.0
+        - image: aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos
           imagePullPolicy: IfNotPresent
           name: nginx-plus-ingress
           ports:
