@@ -19,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: dotnetcorewebapp
+                name: dotnetcorewebapp-prod
                 port:
                   number: 3000
