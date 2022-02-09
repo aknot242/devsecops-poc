@@ -56,8 +56,8 @@ spec:
                   fieldPath: metadata.name
           args:
             - -nginx-plus
-            - -nginx-configmaps=$(POD_NAMESPACE)/nginx-config
-            - -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
+            - -nginx-configmaps=nginx-ingress/nginx-config
+            - -default-server-tls-secret=nginx-ingress/default-server-secret
             - -enable-app-protect
             - -enable-app-protect-dos
 

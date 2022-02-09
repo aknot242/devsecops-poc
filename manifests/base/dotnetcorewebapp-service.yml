@@ -34,7 +34,6 @@ kind: Service
 metadata:
   name: dotnetcorewebapp
 spec:
-  type: ClusterIP
   ports:
     - name: app
       port: 3000
