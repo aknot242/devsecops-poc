@@ -76,7 +76,7 @@ metadata:
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
-      add_header Content-Security-Policy "default-src 'self' http://devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io http://devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
+      add_header Content-Security-Policy "default-src 'self' http://devsecops.hazy.beer http://devsecops.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
     nginx.org/location-snippets: |
       limit_except GET HEAD POST {
           deny all;
@@ -86,10 +86,10 @@ spec:
   ingressClassName: nginx
   # tls:
   #   - hosts:
-  #       - devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io
+  #       - devsecops.hazy.beer
   #     secretName: cafe-secret
   rules:
-    - host: devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io
+    - host: devsecops.hazy.beer
       http:
         paths:
           - path: /

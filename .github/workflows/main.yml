@@ -20,7 +20,7 @@ env:
   AKS_CLUSTER_NAME: edgar-aks-cluster
   NAMESPACE_STAGE: devsecops-stage
   NAMESPACE_PROD: devsecops-prod
-  SITE_URL_STAGING: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
+  SITE_URL_STAGING: devsecops-stage.hazy.beer
 
 jobs:
   build:
