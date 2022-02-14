@@ -11,6 +11,10 @@ metadata:
       add_header Content-Security-Policy "default-src 'self' http://devsecops-prod.hazy.beer http://devsecops-prod.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
  
 spec:
+  tls:
+    - hosts:
+        - devsecops-prod.hazy.beer
+      secretName: cafe-secret
   rules:
     - host: devsecops-prod.hazy.beer
       http:

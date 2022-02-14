@@ -84,10 +84,6 @@ metadata:
 
 spec:
   ingressClassName: nginx
-  # tls:
-  #   - hosts:
-  #       - devsecops.hazy.beer
-  #     secretName: cafe-secret
   rules:
     - host: devsecops.hazy.beer
       http:
