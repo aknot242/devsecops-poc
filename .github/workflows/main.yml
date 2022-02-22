@@ -135,7 +135,7 @@ jobs:
       - name: DAST - OWASP ZAP Scan
         uses: zaproxy/action-full-scan@v0.2.0
         with:
-          target: "http://${{ env.SITE_URL_STAGING }}/"
+          target: "https://${{ env.SITE_URL_STAGING }}/"
           rules_file_name: ".github/zap/rules.tsv"
           fail_action: true
 

@@ -8,7 +8,7 @@ metadata:
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
-      add_header Content-Security-Policy "default-src 'self' http://devsecops-stage.hazy.beer http://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
+      add_header Content-Security-Policy "default-src 'self' https://devsecops-stage.hazy.beer https://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
  
 spec:
   tls:

@@ -73,10 +73,6 @@ metadata:
     appprotect.f5.com/app-protect-security-log-enable: "True"
     appprotect.f5.com/app-protect-security-log: "default/log-elk"
     appprotect.f5.com/app-protect-security-log-destination: "syslog:server=172.19.0.4:5144"
-    nginx.org/server-snippets: |
-      add_header X-Frame-Options "SAMEORIGIN";
-      add_header X-Content-Type-Options "nosniff" always;
-      add_header Content-Security-Policy "default-src 'self' http://devsecops.hazy.beer http://devsecops.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
     nginx.org/location-snippets: |
       limit_except GET HEAD POST {
           deny all;
