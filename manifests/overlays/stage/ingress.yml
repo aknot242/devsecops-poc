@@ -14,7 +14,7 @@ spec:
   tls:
     - hosts:
         - devsecops-stage.hazy.beer
-      secretName: cafe-secret
+      secretName: hazy-beer-secret
   rules:
     - host: devsecops-stage.hazy.beer
       http:
