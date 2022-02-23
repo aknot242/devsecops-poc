@@ -5,8 +5,9 @@ metadata:
   name: devsecops-poc
   annotations:
     # nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
-    appprotect.f5.com/app-protect-policy: "default/devsecops-prod"
-    appprotect.f5.com/app-protect-security-log: "default/logconf-elk-prod"
+    appprotect.f5.com/app-protect-policy: "devsecops-prod"
+    appprotect.f5.com/app-protect-security-log: "logconf-elk-prod"
+    appprotectdos.f5.com/app-protect-dos-resource: "dos-protected-prod"
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
