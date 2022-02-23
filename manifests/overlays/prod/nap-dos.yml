@@ -1,0 +1,18 @@
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: DosProtectedResource
+metadata:
+  name: dos-protected
+spec:
+  enable: true
+  name: "devsecops-prod"
+  apDosPolicy: "dospolicy-prod"
+  # apDosMonitor:
+  #   uri: "webapp.example.com"
+  #   protocol: "http1"
+  #   timeout: 5
+  dosAccessLogDest: "172.19.0.4:5561"
+  dosSecurityLog:
+    enable: true
+    apDosLogConf: "doslogconf"
+    dosLogDest: "172.19.0.4:5261"
