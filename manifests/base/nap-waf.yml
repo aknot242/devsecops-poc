@@ -70,3 +70,46 @@ spec:
           - name: Invalid HTTP Headers
             action: block
             scoreThreshold: "110"
+
+---
+apiVersion: appprotect.f5.com/v1beta1
+kind: APLogConf
+metadata:
+  name: logconf-elk
+spec:
+  filter:
+    request_type: illegal
+  content:
+    format: default
+    max_message_size: 64k
+    max_request_size: any
+
+---
+apiVersion: appprotect.f5.com/v1beta1
+kind: APLogConf
+metadata:
+  name: logconf-all
+spec:
+  filter:
+    request_type: all
+  content:
+    format: default
+    max_message_size: 64k
+    max_request_size: any
+
+---
+apiVersion: appprotect.f5.com/v1beta1
+kind: APLogConf
+metadata:
+  name: logconf-json
+spec:
+  filter:
+    request_type: illegal
+  content:
+    format: user-defined
+    format_string: >-
+      myhostname nginx-app-protect: {"clientIp": "%ip_client%", "clientClass":
+      "%client_class%", "violations": "%violations%", "signatureIds": [%sig_ids%],
+      "supportId": "%support_id%", "violationDetails": "%violation_details%" }
+    max_message_size: 64k
+    max_request_size: any

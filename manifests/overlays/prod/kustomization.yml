@@ -9,4 +9,3 @@ bases:
   - ../../base
 patchesStrategicMerge:
   - ingress.yml
-  - apdos.yml

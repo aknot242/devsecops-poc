@@ -6,8 +6,7 @@ resources:
   - resources.yml
   - crds.yml
   - crds-nap.yml
-  - policy.yml
-  - log.yml
+  - nap-waf.yml
+  - nap-dos.yml
   - dotnetcorewebapp-service.yml
-  - apdos.yml
   - ingress.yml
