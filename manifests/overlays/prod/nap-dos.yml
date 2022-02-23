@@ -5,8 +5,8 @@ metadata:
   name: dos-protected
 spec:
   enable: true
-  name: "devsecops-prod"
-  apDosPolicy: "dospolicy-prod"
+  name: "devsecops-prod.hazy.beer"
+  apDosPolicy: "devsecops-prod/dospolicy-prod"
   # apDosMonitor:
   #   uri: "webapp.example.com"
   #   protocol: "http1"

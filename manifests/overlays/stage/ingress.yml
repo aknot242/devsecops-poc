@@ -7,7 +7,7 @@ metadata:
     # nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
     appprotect.f5.com/app-protect-policy: "devsecops-stage"
     appprotect.f5.com/app-protect-security-log: "logconf-elk-stage"
-    appprotectdos.f5.com/app-protect-dos-resource: "dos-protected-stage"
+    appprotectdos.f5.com/app-protect-dos-resource: "devsecops-stage/dos-protected-stage"
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
