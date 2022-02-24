@@ -23,22 +23,3 @@ spec:
     traffic-mitigation-stats: all
     bad-actors: top 10
     attack-signatures: top 10
-
----
-apiVersion: appprotectdos.f5.com/v1beta1
-kind: DosProtectedResource
-metadata:
-  name: dos-protected
-spec:
-  enable: true
-  name: "devsecops.hazy.beer"
-  apDosPolicy: "dospolicy"
-  # apDosMonitor:
-  #   uri: "webapp.example.com"
-  #   protocol: "http1"
-  #   timeout: 5
-  dosAccessLogDest: "172.19.0.4:5561"
-  dosSecurityLog:
-    enable: true
-    apDosLogConf: "doslogconf"
-    dosLogDest: "172.19.0.4:5261"
