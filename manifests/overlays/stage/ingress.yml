@@ -15,7 +15,7 @@ spec:
             - -default-server-tls-secret=nginx-ingress/default-server-secret
             - -enable-app-protect
             - -enable-app-protect-dos
-            - -watch-namespace devsecops-stage
+            - -watch-namespace=devsecops-stage
 
 ---
 apiVersion: networking.k8s.io/v1
