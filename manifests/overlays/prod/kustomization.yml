@@ -9,3 +9,4 @@ bases:
   - ../../base
 patchesStrategicMerge:
   - ingress.yml
+  - nap-dos.yml

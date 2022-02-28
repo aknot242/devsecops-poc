@@ -1,4 +1,23 @@
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress
+spec:
+  template:
+    spec:
+      containers:
+        - name: nginx-plus-ingress
+          args:
+            - -nginx-plus
+            - -enable-snippets
+            - -nginx-configmaps=nginx-ingress/nginx-config
+            - -default-server-tls-secret=nginx-ingress/default-server-secret
+            - -enable-app-protect
+            - -enable-app-protect-dos
+            - -watch-namespace devsecops-stage
+
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -14,6 +33,7 @@ metadata:
       add_header Content-Security-Policy "default-src 'self' https://devsecops-stage.hazy.beer https://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
  
 spec:
+  ingressClassName: nginx-stage
   tls:
     - hosts:
         - devsecops-stage.hazy.beer
