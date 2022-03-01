@@ -16,6 +16,7 @@ spec:
             - -enable-app-protect
             - -enable-app-protect-dos
             - -watch-namespace=devsecops-prod
+            - -ingress-class=nginx-prod
 
 ---
 apiVersion: networking.k8s.io/v1
