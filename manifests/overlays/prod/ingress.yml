@@ -12,7 +12,7 @@ spec:
             - -nginx-plus
             - -enable-snippets
             - -nginx-configmaps=nginx-ingress/nginx-config
-            - -default-server-tls-secret=nginx-ingress/default-server-secret
+            - -default-server-tls-secret=nginx-ingress/default-server-secret-prod
             - -enable-app-protect
             - -enable-app-protect-dos
             - -watch-namespace=devsecops-prod
