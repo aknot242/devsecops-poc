@@ -6,6 +6,8 @@ metadata:
 spec:
   name: "devsecops-prod.hazy.beer"
   apDosPolicy: "devsecops-prod/dospolicy-prod"
+  dosSecurityLog:
+    apDosLogConf: doslogconf-prod
   # apDosMonitor:
   #   uri: "webapp.example.com"
   #   protocol: "http1"
