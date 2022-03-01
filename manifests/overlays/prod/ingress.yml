@@ -38,7 +38,7 @@ spec:
   tls:
     - hosts:
         - devsecops-prod.hazy.beer
-      secretName: hazy-beer-secret
+      secretName: hazy-beer-secret-prod
   rules:
     - host: devsecops-prod.hazy.beer
       http:
