@@ -11,8 +11,8 @@ spec:
           args:
             - -nginx-plus
             - -enable-snippets
-            - -nginx-configmaps=nginx-ingress/nginx-config
-            - -default-server-tls-secret=nginx-ingress/default-server-secret-stage
+            - -nginx-configmaps=devsecops-stage/nginx-config-stage
+            - -default-server-tls-secret=devsecops-stage/default-server-secret-stage
             - -enable-app-protect
             - -enable-app-protect-dos
             - -watch-namespace=devsecops-stage
