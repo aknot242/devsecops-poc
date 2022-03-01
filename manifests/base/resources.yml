@@ -18,7 +18,7 @@ metadata:
 data:
   set-real-ip-from: "0.0.0.0/0"
   real-ip-header: "X-Forwarded-For"
-  real-ip-recursive: "on"
+  real-ip-recursive: "True"
 
 ---
 apiVersion: networking.k8s.io/v1
