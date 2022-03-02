@@ -24,6 +24,14 @@ data:
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-  name: nginx
+  name: nginx-stage
+spec:
+  controller: nginx.org/ingress-controller
+
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx-prod
 spec:
   controller: nginx.org/ingress-controller
