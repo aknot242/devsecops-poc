@@ -11,8 +11,8 @@ spec:
           args:
             - -nginx-plus
             - -enable-snippets
-            - -nginx-configmaps=devsecops-prod/nginx-config-prod
-            - -default-server-tls-secret=devsecops-prod/default-server-secret-prod
+            - -nginx-configmaps=devsecops-prod/nginx-config
+            - -default-server-tls-secret=devsecops-prod/default-server-secret
             - -enable-app-protect
             - -enable-app-protect-dos
             - -watch-namespace=devsecops-prod
@@ -22,12 +22,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: devsecops-poc
+  name: devsecops
   annotations:
     # nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
-    appprotect.f5.com/app-protect-policy: "devsecops-prod/devsecops-prod"
-    appprotect.f5.com/app-protect-security-log: "devsecops-prod/logconf-elk-prod"
-    appprotectdos.f5.com/app-protect-dos-resource: "devsecops-prod/dos-protected-prod"
+    appprotect.f5.com/app-protect-policy: "devsecops-prod/devsecops"
+    appprotect.f5.com/app-protect-security-log: "devsecops-prod/logconf-elk"
+    appprotectdos.f5.com/app-protect-dos-resource: "devsecops-prod/dos-protected"
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
@@ -38,7 +38,7 @@ spec:
   tls:
     - hosts:
         - devsecops-prod.hazy.beer
-      secretName: hazy-beer-secret-prod
+      secretName: hazy-beer-secret
   rules:
     - host: devsecops-prod.hazy.beer
       http:
@@ -47,6 +47,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: dotnetcorewebapp-prod
+                name: dotnetcorewebapp
                 port:
                   number: 3000

@@ -11,23 +11,23 @@ spec:
           args:
             - -nginx-plus
             - -enable-snippets
-            - -nginx-configmaps=devsecops-stage/nginx-config-stage
-            - -default-server-tls-secret=devsecops-stage/default-server-secret-stage
+            - -nginx-configmaps=devsecops-stage/nginx-config
+            - -default-server-tls-secret=devsecops-stage/default-server-secret
             - -enable-app-protect
             - -enable-app-protect-dos
-            - -watch-namespace=devsecops-stage
+            - -watch-namespace=devsecops
             - -ingress-class=nginx-stage
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: devsecops-poc
+  name: devsecops
   annotations:
     # nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
-    appprotect.f5.com/app-protect-policy: "devsecops-stage/devsecops-stage"
-    appprotect.f5.com/app-protect-security-log: "devsecops-stage/logconf-elk-stage"
-    appprotectdos.f5.com/app-protect-dos-resource: "devsecops-stage/dos-protected-stage"
+    appprotect.f5.com/app-protect-policy: "devsecops-stage/devsecops"
+    appprotect.f5.com/app-protect-security-log: "devsecops-stage/logconf-elk"
+    appprotectdos.f5.com/app-protect-dos-resource: "devsecops-stage/dos-protected"
     nginx.org/server-snippets: |
       add_header X-Frame-Options "SAMEORIGIN";
       add_header X-Content-Type-Options "nosniff" always;
@@ -38,7 +38,7 @@ spec:
   tls:
     - hosts:
         - devsecops-stage.hazy.beer
-      secretName: hazy-beer-secret-stage
+      secretName: hazy-beer-secret
   rules:
     - host: devsecops-stage.hazy.beer
       http:
@@ -47,6 +47,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: dotnetcorewebapp-stage
+                name: dotnetcorewebapp
                 port:
                   number: 3000

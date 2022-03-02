@@ -5,9 +5,9 @@ metadata:
   name: dos-protected
 spec:
   name: "devsecops-stage.hazy.beer"
-  apDosPolicy: "devsecops-stage/dospolicy-stage"
+  apDosPolicy: "devsecops-stage/dospolicy"
   dosSecurityLog:
-    apDosLogConf: doslogconf-stage
+    apDosLogConf: doslogconf
   # apDosMonitor:
   #   uri: "webapp.example.com"
   #   protocol: "http1"
