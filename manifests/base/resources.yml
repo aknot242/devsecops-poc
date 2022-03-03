@@ -19,19 +19,3 @@ data:
   set-real-ip-from: "0.0.0.0/0"
   real-ip-header: "X-Forwarded-For"
   real-ip-recursive: "True"
-
----
-apiVersion: networking.k8s.io/v1
-kind: IngressClass
-metadata:
-  name: nginx-stage
-spec:
-  controller: nginx.org/ingress-controller
-
----
-apiVersion: networking.k8s.io/v1
-kind: IngressClass
-metadata:
-  name: nginx-prod
-spec:
-  controller: nginx.org/ingress-controller
