@@ -15,7 +15,7 @@ spec:
             - -default-server-tls-secret=devsecops-stage/default-server-secret
             - -enable-app-protect
             - -enable-app-protect-dos
-            - -watch-namespace=devsecops
+            - -watch-namespace=devsecops-stage
             - -ingress-class=nginx-stage
 
 ---
@@ -34,7 +34,7 @@ metadata:
       add_header Content-Security-Policy "default-src 'self' https://devsecops-stage.hazy.beer https://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
  
 spec:
-  ingressClassName: nginx-stage
+  ingressClassName: nginx
   tls:
     - hosts:
         - devsecops-stage.hazy.beer
