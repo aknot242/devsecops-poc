@@ -55,21 +55,6 @@ spec:
                   fieldPath: metadata.name
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: devsecops
-  annotations:
-    appprotect.f5.com/app-protect-enable: "True"
-    appprotect.f5.com/app-protect-security-log-enable: "True"
-    appprotect.f5.com/app-protect-security-log-destination: "syslog:server=172.19.0.4:5144"
-    nginx.org/hsts: "True"
-    nginx.org/location-snippets: |
-      limit_except GET HEAD POST {
-          deny all;
-      }
-
----
 apiVersion: v1
 kind: Service
 metadata:

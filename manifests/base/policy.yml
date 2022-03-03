@@ -1,0 +1,12 @@
+---
+apiVersion: k8s.nginx.org/v1
+kind: Policy
+metadata:
+  name: devsecops-waf-policy
+spec:
+  waf:
+    enable: true
+    securityLog:
+      enable: true
+      apLogConf: "devsecops-stage/logconf-elk"
+      logDest: "syslog:server=172.19.0.4:5144"

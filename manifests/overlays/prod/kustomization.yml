@@ -7,5 +7,7 @@ commonLabels:
 bases:
   - ../../base
 patchesStrategicMerge:
-  - ingress.yml
   - nap-dos.yml
+  - policy.yml
+  - ingress.yml
+  - vs.yml
