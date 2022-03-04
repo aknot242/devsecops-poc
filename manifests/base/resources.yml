@@ -16,7 +16,4 @@ metadata:
   name: nginx-config
   namespace: nginx-ingress
 data:
-  set-real-ip-from: "0.0.0.0/0"
-  real-ip-header: "X-Forwarded-For"
-  real-ip-recursive: "True"
   ssl-redirect: "True"
