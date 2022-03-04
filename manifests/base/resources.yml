@@ -20,3 +20,4 @@ data:
   real-ip-header: "X-Forwarded-For"
   real-ip-recursive: "True"
   hsts: "True"
+  redirect-to-https: "True"
