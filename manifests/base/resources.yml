@@ -16,4 +16,7 @@ metadata:
   name: nginx-config
   namespace: nginx-ingress
 data:
-  ssl-redirect: "True"
+  server-snippets: |
+    if ($scheme = 'http') {
+      return 302 https://$host$request_uri;
+    }
