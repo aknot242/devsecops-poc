@@ -5,10 +5,6 @@ metadata:
   name: devsecops
 spec:
   ingressClassName: nginx-stage
-  server-snippets: |
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Content-Security-Policy "default-src 'self' https://devsecops-stage.hazy.beer https://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';" always;
   host: devsecops-stage.hazy.beer
   routes:
     - path: /
@@ -18,4 +14,15 @@ spec:
             deny all;
         }
       action:
-        pass: dotnetcorewebapp-upstream
+        proxy:
+          upstream: dotnetcorewebapp-upstream
+          responseHeaders:
+            add:
+              - name: X-Frame-Options
+                value: SAMEORIGIN
+              - name: X-Content-Type-Options
+                value: nosniff
+                always: true
+              - name: Content-Security-Policy
+                value: "default-src 'self' https://devsecops-stage.hazy.beer https://devsecops-stage.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';"
+                always: true
