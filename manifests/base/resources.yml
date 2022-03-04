@@ -19,5 +19,4 @@ data:
   set-real-ip-from: "0.0.0.0/0"
   real-ip-header: "X-Forwarded-For"
   real-ip-recursive: "True"
-  hsts: "True"
   redirect-to-https: "True"

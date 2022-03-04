@@ -23,6 +23,9 @@ spec:
               - name: X-Content-Type-Options
                 value: nosniff
                 always: true
+              - name: Strict-Transport-Security
+                value: "max-age=31536000; includeSubDomains; preload;"
+                always: true
               - name: Content-Security-Policy
                 value: "default-src 'self' https://devsecops-prod.hazy.beer https://devsecops-prod.hazy.beer; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; media-src 'self'; form-action 'self'; frame-ancestors 'self';"
                 always: true
