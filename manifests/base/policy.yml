@@ -8,5 +8,4 @@ spec:
     enable: true
     securityLog:
       enable: true
-      apLogConf: "devsecops-stage/logconf-elk"
       logDest: "syslog:server=172.19.0.4:5144"

@@ -6,3 +6,5 @@ metadata:
 spec:
   waf:
     apPolicy: "devsecops-prod/devsecops"
+    securityLog:
+      apLogConf: "devsecops-prod/logconf-elk"
