@@ -31,8 +31,6 @@ metadata:
   name: dos-protected
 spec:
   enable: true
-  dosAccessLogDest: "logstash:5561"
   dosSecurityLog:
     enable: true
     apDosLogConf: "doslogconf"
-    dosLogDest: "logstash:5261"

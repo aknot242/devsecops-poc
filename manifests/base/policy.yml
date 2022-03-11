@@ -8,4 +8,3 @@ spec:
     enable: true
     securityLog:
       enable: true
-      logDest: "syslog:server=logstash:5144"

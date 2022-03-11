@@ -8,3 +8,4 @@ spec:
     apPolicy: "devsecops-stage/devsecops"
     securityLog:
       apLogConf: "devsecops-stage/logconf-elk"
+      logDest: "syslog:server=logstash.devsecops-stage.svc.cluster.local:5144"
