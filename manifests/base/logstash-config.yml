@@ -1,0 +1,172 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+  logstash-waf.conf: |
+    input {
+      syslog {
+        port => 5144
+        codec => plain {
+          charset => "ISO-8859-1"
+        }
+      }
+    }
+    filter {
+      grok {
+        match => {
+          "message" => [
+            ",attack_type=\"%{DATA:attack_type}\"",
+            ",blocking_exception_reason=\"%{DATA:blocking_exception_reason}\"",
+            ",bot_anomalies=\"%{DATA:bot_anomalies}\"",
+            ",bot_category=\"%{DATA:bot_category}\"",
+            ",bot_signature_name=\"%{DATA:bot_signature_name}\"",
+            ",client_application=\"%{DATA:client_application}\"",
+            ",client_application_version=\"%{DATA:client_application_version}\"",
+            ",client_class=\"%{DATA:client_class}\"",
+            ",date_time=\"%{DATA:date_time}\"",
+            ",dest_port=\"%{DATA:dest_port}\"",
+            ",enforced_bot_anomalies=\"%{DATA:enforced_bot_anomalies}\"",
+            ",grpc_method=\"%{DATA:grpc_method}\"",
+            ",grpc_service=\"%{DATA:grpc_service}\"",
+            ",ip_client=\"%{DATA:ip_client}\"",
+            ",is_truncated=\"%{DATA:is_truncated}\"",
+            ",method=\"%{DATA:method}\"",
+            ",outcome=\"%{DATA:outcome}\"",
+            ",outcome_reason=\"%{DATA:outcome_reason}\"",
+            ",policy_name=\"%{DATA:policy_name}\"",
+            ",protocol=\"%{DATA:protocol}\"",
+            ",request_status=\"%{DATA:request_status}\"",
+            ",request=\"%{DATA:request}\"",
+            ",request_body_base64=\"%{DATA:request_body_base64}\"",
+            ",response_code=\"%{DATA:response_code}\"",
+            ",severity=\"%{DATA:severity}\"",
+            ",sig_cves=\"%{DATA:sig_cves}\"",
+            ",sig_ids=\"%{DATA:sig_ids}\"",
+            ",sig_names=\"%{DATA:sig_names}\"",
+            ",sig_set_names=\"%{DATA:sig_set_names}\"",
+            ",src_port=\"%{DATA:src_port}\"",
+            ",sub_violations=\"%{DATA:sub_violations}\"",
+            ",support_id=\"%{DATA:support_id}\"",
+            ",threat_campaign_names=\"%{DATA:threat_campaign_names}\"",
+            ",unit_hostname=\"%{DATA:unit_hostname}\"",
+            ",uri=\"%{DATA:uri}\"",
+            ",violations=\"%{DATA:violations}\"",
+            ",violation_details=\"%{DATA:violation_details_xml}\"",
+            ",violation_rating=\"%{DATA:violation_rating}\"",
+            ",vs_name=\"%{DATA:vs_name}\"",
+            ",x_forwarded_for_header_value=\"%{DATA:x_forwarded_for_header_value}\""
+          ]
+        }
+        break_on_match => false
+      }
+      if [violation_details_xml] != "N/A" {
+        xml {
+          source => "violation_details_xml"
+          target => "violation_details"
+        }
+      }
+      mutate {
+        split => { "attack_type" => "," }
+        split => { "sig_ids" => "," }
+        split => { "sig_names" => "," }
+        split => { "sig_cves" => "," }
+        split => { "staged_sig_ids" => "," }
+        split => { "staged_sig_names" => "," }
+        split => { "staged_sig_cves" => "," }
+        split => { "sig_set_names" => "," }
+        split => { "threat_campaign_names" => "," }
+        split => { "staged_threat_campaign_names" => "," }
+        split => { "violations" => "," }
+        split => { "sub_violations" => "," }
+        remove_field => [
+          "[violation_details][violation_masks]",
+          "violation_details_xml",
+          "message"
+        ]
+      }
+      if [x_forwarded_for_header_value] != "N/A" {
+        mutate { add_field => { "source_host" => "%{x_forwarded_for_header_value}"}}
+      } else {
+        mutate { add_field => { "source_host" => "%{ip_client}"}}
+      }
+      geoip {
+        source => "source_host"
+      }
+      ruby {
+          code => "
+              require 'base64';
+
+              data = event.get('[violation_details]');
+
+              def check64(value)
+                value.is_a?(String) && Base64.strict_encode64(Base64.decode64(value)) == value;
+              end
+
+              def iterate(key, i, event)
+                if i.is_a?(Hash)
+                  i.each do |k, v|
+                    if v.is_a?(Hash) || v.is_a?(Array)
+                      newkey = key + '[' + k + ']';
+                      iterate(newkey, v, event)
+                    end
+                  end
+                else if i.is_a?(Array)
+                  i.each do |v|
+                        iterate(key, v, event)
+                  end
+                else
+                  if check64(i)
+                    event.set(key, Base64.decode64(i))
+                  end
+                end
+              end
+              end
+              iterate('[violation_details_b64decoded]', data, event)
+          "
+        }
+    }
+    output {
+      elasticsearch {
+        hosts => [ "${ES_HOSTS}" ]
+        index => "waf-logs-%{+YYY.MM.dd}"
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+        cacert => '/etc/logstash/certificates/ca.crt'
+      }
+    }
+
+  logstash-dos.conf: |
+    input {
+      syslog {
+        port => 5261
+      }
+      udp {
+        port => 5561
+      }
+    }
+
+    filter {
+      kv {
+          source => "message"
+          field_split => ", "
+          value_split => "="
+      }
+      geoip {
+        source => "ip"
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => [ "${ES_HOSTS}" ]
+        index => "app-protect-dos-logs"
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+        cacert => '/etc/logstash/certificates/ca.crt'
+      }
+    }

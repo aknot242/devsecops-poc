@@ -6,6 +6,8 @@ resources:
   - resources.yml
   - crds.yml
   - crds-nap.yml
+  - logstash-config.yml
+  - logstash-deployment.yml
   - nap-waf.yml
   - policy.yml
   - nap-dos.yml
