@@ -30,9 +30,6 @@ spec:
           mountPath: /usr/share/logstash/config
         - name: logstash-pipeline-volume
           mountPath: /usr/share/logstash/pipeline
-        - name: cert-ca
-          mountPath: "/etc/logstash/certificates"
-          readOnly: true
   restartPolicy: OnFailure
   volumes:
     - name: config-volume
@@ -49,9 +46,6 @@ spec:
             path: logstash-waf.conf
           - key: logstash-dos.conf
             path: logstash-dos.conf
-    - name: cert-ca
-      secret:
-        secretName: elasticsearch-es-http-certs-public
 status: {}
 
 ---

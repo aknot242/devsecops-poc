@@ -136,7 +136,6 @@ data:
         index => "waf-logs-%{+YYY.MM.dd}"
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        cacert => '/etc/logstash/certificates/ca.crt'
       }
     }
 
@@ -167,6 +166,5 @@ data:
         index => "app-protect-dos-logs"
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        cacert => '/etc/logstash/certificates/ca.crt'
       }
     }
