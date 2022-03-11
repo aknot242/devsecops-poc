@@ -7,7 +7,7 @@ metadata:
   name: logstash
 spec:
   containers:
-    - image: docker.elastic.co/logstash/logstash:8.1.0
+    - image: docker.elastic.co/logstash/logstash:7.17.1
       name: logstash
       ports:
         - containerPort: 25826
