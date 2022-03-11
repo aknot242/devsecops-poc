@@ -16,9 +16,15 @@ spec:
         - containerPort: 5561
       env:
         - name: ES_HOSTS
-          value: "https://elasticsearch-es-http:9200"
+          valueFrom:
+            secretKeyRef:
+              name: elastic-secret
+              key: host
         - name: ES_USER
-          value: "elastic"
+          valueFrom:
+            secretKeyRef:
+              name: elastic-secret
+              key: username
         - name: ES_PASSWORD
           valueFrom:
             secretKeyRef:
