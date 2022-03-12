@@ -137,6 +137,11 @@ data:
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
       }
+      output {
+        file {
+          path => /var/log/logstash/waf.log
+        }
+      }
     }
 
   logstash-dos.conf: |
@@ -166,5 +171,10 @@ data:
         index => "app-protect-dos-logs"
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
+      }
+      output {
+        file {
+          path => /var/log/logstash/dos.log
+        }
       }
     }
