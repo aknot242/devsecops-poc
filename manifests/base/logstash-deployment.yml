@@ -44,12 +44,12 @@ spec:
         items:
           - key: logstash.yml
             path: logstash.yml
+          - key: pipelines.yml
+            path: pipelines.yml
     - name: logstash-pipeline-volume
       configMap:
         name: logstash-configmap
         items:
-          - key: pipelines.yml
-            path: pipelines.yml
           - key: logstash-waf.conf
             path: logstash-waf.conf
           - key: logstash-dos.conf
