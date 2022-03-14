@@ -6,7 +6,10 @@ metadata:
 data:
   logstash.yml: |
     http.host: "0.0.0.0"
-    path.config: /usr/share/logstash/pipeline
+    - pipeline.id: napwaf
+      path.config: "/usr/share/logstash/pipeline/logstash-waf.conf"
+    - pipeline.id: napdos
+      path.config: "/usr/share/logstash/pipeline/logstash-dos.conf"
   logstash-waf.conf: |
     input {
       syslog {
