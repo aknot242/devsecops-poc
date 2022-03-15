@@ -18,6 +18,7 @@ env:
   AZURE_RESOURCE_GROUP: edgar-rg
   ACR_NAME: aknot242
   AKS_CLUSTER_NAME: edgar-aks-cluster
+  APPLICATION_NAME: dotnetcorewebapp
   NAMESPACE_STAGE: devsecops-stage
   NAMESPACE_PROD: devsecops-prod
   SITE_URL_STAGING: devsecops-stage.hazy.beer
@@ -26,7 +27,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Job start webhook notification
         uses: distributhor/workflow-webhook@v2.0.2
         env:
@@ -79,7 +79,7 @@ jobs:
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
       # - name: Set manifest overrides for stage env from GitHub secrets
-      #   uses: microsoft/variable-substitution@v1 
+      #   uses: microsoft/variable-substitution@v1
       #   with:
       #     files: "./manifests/overlays/stage/ingress.yml"
       #   env:
@@ -91,15 +91,25 @@ jobs:
           renderEngine: "kustomize"
           kustomizationPath: "./manifests/overlays/stage/"
           kubectl-version: "latest"
-        id: stagebake
+        id: stageBake
 
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
           namespace: "${{ env.NAMESPACE_STAGE }}"
-          manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
+          manifests: ${{ steps.stageBake.outputs.manifestsBundle }}
           images: |
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Log Stage Deployment Event
+        run: ./.github/scripts/register-deploy.sh
+        shell: bash
+        env:
+          APPLICATION_NAME: ${{ env.APPLICATION_NAME }}
+          ENVIRONMENT_NAME: ${{ env.NAMESPACE_STAGE }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+          ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+          ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
 
       - name: Selenium - Set up Python 3.9
         uses: actions/setup-python@v1
@@ -177,7 +187,7 @@ jobs:
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
       # - name: Set manifest overrides for prod from GitHub secrets
-      #   uses: microsoft/variable-substitution@v1 
+      #   uses: microsoft/variable-substitution@v1
       #   with:
       #     files: "./manifests/overlays/prod/ingress.yml"
       #   env:
@@ -189,15 +199,25 @@ jobs:
           renderEngine: "kustomize"
           kustomizationPath: "./manifests/overlays/prod/"
           kubectl-version: "latest"
-        id: prodbake
+        id: prodBake
 
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
           namespace: "${{ env.NAMESPACE_PROD }}"
-          manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
+          manifests: ${{ steps.prodBake.outputs.manifestsBundle }}
           images: |
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Log Prod Deployment Event
+        run: ./.github/scripts/register-deploy.sh
+        shell: bash
+        env:
+          APPLICATION_NAME: ${{ env.APPLICATION_NAME }}
+          ENVIRONMENT_NAME: ${{ env.NAMESPACE_PROD }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+          ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+          ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
 
       - name: Azure logout
         run: |
