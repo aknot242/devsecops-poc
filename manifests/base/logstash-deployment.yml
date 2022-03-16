@@ -11,9 +11,13 @@ spec:
       name: logstash
       ports:
         - containerPort: 25826
+          protocol: TCP
         - containerPort: 5144
+          protocol: TCP
         - containerPort: 5261
+          protocol: TCP
         - containerPort: 5561
+          protocol: UDP
       env:
         - name: ES_HOSTS
           valueFrom:
@@ -66,17 +70,22 @@ metadata:
 spec:
   ports:
     - name: "25826"
+      protocol: TCP
       port: 25826
       targetPort: 25826
     - name: "5144"
+      protocol: TCP
       port: 5144
       targetPort: 5144
     - name: "5261"
+      protocol: TCP
       port: 5261
       targetPort: 5261
     - name: "5561"
+      protocol: UDP
       port: 5561
       targetPort: 5561
+
   selector:
     app: logstash
 status:
