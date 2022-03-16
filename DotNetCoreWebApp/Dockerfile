@@ -14,6 +14,8 @@ FROM build AS publish
 RUN dotnet publish "DotNetCoreWebApp.csproj" -c Release -o /app/publish
 
 FROM base AS final
+RUN useradd -d /home/aspnet -m -s /bin/bash aspnet
+USER aspnet
 ENV ASPNETCORE_URLS=http://+:3000
 WORKDIR /app
 COPY --from=publish /app/publish .
