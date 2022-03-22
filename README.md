@@ -63,18 +63,22 @@ az login --use-device-code
 az acr login --name <your acr name>
 
 make debian-image-nap-dos-plus PREFIX=<your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos TARGET=download
-
 ```
 
 Get the tag from the container built above: `docker image ls <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos`
 
-
 ``` bash
-
 docker tag aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:<the tag from above> aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:latest
 
 docker push <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos
+```
 
+#### Create Elastic and Kibana Dashboard Resources
+
+This solution makes use of the [Elastic Cloud](https://www.elastic.co/cloud/), specifically Elastic and Kibana for NGINX App Protect WAF & DoS analytics. You can set up a free trial for this, or use an existing subscription. Once available, use the following script to install the resources needed:
+
+``` bash
+cd analytics && ./elastic-setup.sh -a \"https://my-deployment:9243\" -b \"elastic:mypassword\" -c \"https://my-deployment:9243\" -d \"elastic:mypassword\"
 ```
 
 #### Create DNS Zones and Records
