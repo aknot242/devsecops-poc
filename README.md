@@ -26,7 +26,7 @@ The repository is featured in the [Automate Application Security with NGINX](htt
 The following are the high-level tasks needed to be able to run this POC yourself.
 
 - Set up an Azure Container Registry
-- Build and push the NGINX Kubernetes Ingress Controller + App Protect WAF + DoS container to the registry using the steps in the [section](#build-nginx-ingress-controller+nap-waf-dos-container-and-push-to-acr) below
+- Build and push the NGINX Kubernetes Ingress Controller + App Protect WAF + DoS container to the registry using the steps in the [section](#user-content-build-nginx-app-protect-waf--dos-container-and-push-to-acr) below
 - Set up an Azure Kubernetes Server cluster
 - Create both `devsecops-stage` and `devsecops-prod` namespaces in the Kubernetes cluster
 - Install [cert-manager](https://cert-manager.io/) in the cluster
@@ -57,20 +57,26 @@ The following are the high-level tasks needed to be able to run this POC yoursel
 #### Build NGINX Ingress Controller + NGINX App Protect WAF + DoS Container and push to ACR
 The workflow requires an NGINX Ingress Controller + NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
 
+NOTE: Ensure that your NGINX certificate and key files (`nginx-repo.crt` and `nginx-repo.key`) are present in the root of this directory before executing the following commands.
+
 ``` bash
-cd app-protect
+ACR_NAME=<your ACR name>
+KIC_VERSION=2.1.2
+
 az login --use-device-code
-az acr login --name <your acr name>
+az acr login --name "$ACR_NAME"
 
-make debian-image-nap-dos-plus PREFIX=<your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos TARGET=download
-```
+git clone -b "v$KIC_VERSION" https://github.com/nginxinc/kubernetes-ingress.git
+cp nginx-repo.* kubernetes-ingress
+pushd kubernetes-ingress
 
-Get the tag from the container built above: `docker image ls <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos`
+make debian-image-nap-dos-plus PREFIX="$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos" TAG="$KIC_VERSION" TARGET=download
 
-``` bash
-docker tag aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:<the tag from above> aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:latest
+popd
 
-docker push <your acr name>.azurecr.io/nginx-plus-ingress-nap-waf-dos
+docker tag "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos:$KIC_VERSION" "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos:latest"
+
+docker push --all-tags "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos"
 ```
 
 #### Create Elastic and Kibana Dashboard Resources
