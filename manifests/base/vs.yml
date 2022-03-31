@@ -1,0 +1,14 @@
+---
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: devsecops
+spec:
+  tls:
+    secret: hazy-beer-secret
+  policies:
+    - name: devsecops-waf-policy
+  upstreams:
+    - name: dotnetcorewebapp-upstream
+      service: dotnetcorewebapp
+      port: 3000

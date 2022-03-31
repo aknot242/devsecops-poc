@@ -18,15 +18,15 @@ env:
   AZURE_RESOURCE_GROUP: edgar-rg
   ACR_NAME: aknot242
   AKS_CLUSTER_NAME: edgar-aks-cluster
+  APPLICATION_NAME: dotnetcorewebapp
   NAMESPACE_STAGE: devsecops-stage
   NAMESPACE_PROD: devsecops-prod
-  SITE_URL_STAGING: devsecops-poc-stage.28d5d6771fc84adba80b.westus2.aksapp.io
+  SITE_URL_STAGING: devsecops-stage.hazy.beer
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Job start webhook notification
         uses: distributhor/workflow-webhook@v2.0.2
         env:
@@ -60,12 +60,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and push App Protect container
-        run: |
-          cd app-protect
-          docker build -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }} -t ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:latest -f NAP-App-Dockerfile .
-          docker push ${{ secrets.REGISTRY_SERVERNAME }}/nap-dotnetcorewebapp:${{ github.sha }}
-
       - name: Build and push DotNet app container
         run: |
           cd DotNetCoreWebApp
@@ -84,29 +78,31 @@ jobs:
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
-      # - name: Set manifest overrides for stage env from GitHub secrets
-      #   uses: microsoft/variable-substitution@v1 
-      #   with:
-      #     files: "./manifests/overlays/stage/ingress.yml"
-      #   env:
-      #     metadata.annotations.nginx.ingress.kubernetes.io/whitelist-source-range: ${{ secrets.IP_ALLOW_LIST_STAGE }}
-
       - name: Bake manifests for stage deployment
         uses: azure/k8s-bake@v1
         with:
           renderEngine: "kustomize"
           kustomizationPath: "./manifests/overlays/stage/"
           kubectl-version: "latest"
-        id: stagebake
+        id: stageBake
 
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
           namespace: "${{ env.NAMESPACE_STAGE }}"
-          manifests: ${{ steps.stagebake.outputs.manifestsBundle }}
+          manifests: ${{ steps.stageBake.outputs.manifestsBundle }}
           images: |
-            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Log Stage Deployment Event
+        run: ./.github/scripts/register-deploy.sh
+        shell: bash
+        env:
+          APPLICATION_NAME: ${{ env.APPLICATION_NAME }}
+          ENVIRONMENT_NAME: ${{ env.NAMESPACE_STAGE }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+          ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+          ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
 
       - name: Selenium - Set up Python 3.9
         uses: actions/setup-python@v1
@@ -142,7 +138,7 @@ jobs:
       - name: DAST - OWASP ZAP Scan
         uses: zaproxy/action-full-scan@v0.2.0
         with:
-          target: "http://${{ env.SITE_URL_STAGING }}/"
+          target: "https://${{ env.SITE_URL_STAGING }}/"
           rules_file_name: ".github/zap/rules.tsv"
           fail_action: true
 
@@ -183,29 +179,31 @@ jobs:
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
 
-      # - name: Set manifest overrides for prod from GitHub secrets
-      #   uses: microsoft/variable-substitution@v1 
-      #   with:
-      #     files: "./manifests/overlays/prod/ingress.yml"
-      #   env:
-      #     metadata.annotations.nginx.ingress.kubernetes.io/whitelist-source-range: ${{ secrets.IP_ALLOW_LIST_PROD }}
-
       - name: Bake manifests for prod deployment
         uses: azure/k8s-bake@v1
         with:
           renderEngine: "kustomize"
           kustomizationPath: "./manifests/overlays/prod/"
           kubectl-version: "latest"
-        id: prodbake
+        id: prodBake
 
       - name: Deploy to AKS
         uses: Azure/k8s-deploy@v1.4
         with:
           namespace: "${{ env.NAMESPACE_PROD }}"
-          manifests: ${{ steps.prodbake.outputs.manifestsBundle }}
+          manifests: ${{ steps.prodBake.outputs.manifestsBundle }}
           images: |
-            ${{ env.ACR_NAME }}.azurecr.io/nap-dotnetcorewebapp:${{ github.sha }}
             ${{ env.ACR_NAME }}.azurecr.io/dotnetcorewebapp:${{ github.sha }}
+
+      - name: Log Prod Deployment Event
+        run: ./.github/scripts/register-deploy.sh
+        shell: bash
+        env:
+          APPLICATION_NAME: ${{ env.APPLICATION_NAME }}
+          ENVIRONMENT_NAME: ${{ env.NAMESPACE_PROD }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+          ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+          ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
 
       - name: Azure logout
         run: |

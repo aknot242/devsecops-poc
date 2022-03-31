@@ -1,19 +1,75 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: devsecops-poc
-  annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
+  name: nginx-ingress
 spec:
-  rules:
-    - host: devsecops-poc.28d5d6771fc84adba80b.westus2.aksapp.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nap-dotnetcorewebapp
-                port:
-                  number: 80
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-ingress
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+      #annotations:
+      #prometheus.io/scrape: "true"
+      #prometheus.io/port: "9113"
+      #prometheus.io/scheme: http
+    spec:
+      serviceAccountName: nginx-ingress
+      containers:
+        - name: nginx-plus-ingress
+          image: aknot242.azurecr.io/nginx-plus-ingress-nap-waf-dos:2.1.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: readiness-port
+              containerPort: 8081
+            - name: prometheus
+              containerPort: 9113
+          readinessProbe:
+            httpGet:
+              path: /nginx-ready
+              port: readiness-port
+            periodSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsUser: 101 #nginx
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: 443
+      protocol: TCP
+      name: https
+  selector:
+    app: nginx-ingress

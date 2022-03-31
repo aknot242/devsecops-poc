@@ -11,54 +11,86 @@ The repository is featured in the [Automate Application Security with NGINX](htt
 - GitHub CI/CD has been leveraged for testing DevSecOps pipeline
 - GitHub Actions pipeline has been implemented
 - .NET code project built as docker container
-- NGINX App Protect WAF and DoS are built into a docker container
+- NGINX Kubernetes Ingress Controller + App Protect WAF and DoS are built into a docker container
 - Containers are deployed to Azure Container Registry
-- Application and App Protect proxy tiers are deployed to Azure Kubernetes Service
+- Application is deployed to Azure Kubernetes Service
 - CodeQL - GitHub's new code scanning workflow has been added for code scan
 - Container linting, package vulnerability scanning
 - Selenium tests run
 - OWASP ZAP DAST scan run
-- Container action has been added
+- cert-manager has been installed to k8s cluster to manage the lifecycle of Let's Encrypt certificates
+- cert-manager has been configured to update Azure DNS Zone with the DNS challenges for Let's Encrypt
 
 ## Getting Started
 
 The following are the high-level tasks needed to be able to run this POC yourself.
 
 - Set up an Azure Container Registry
-- Build and push The NGINX App Protect WAF + DoS container to the registry using the steps in the [section](#build-nap-waf-dos-container-and-push-to-acr) below
-- Set up an Azure Kubernetes Server cluster with an HTTP ingress enabled
+- Build and push the NGINX Kubernetes Ingress Controller + App Protect WAF + DoS container to the registry using the steps in the [section](#user-content-build-nginx-app-protect-waf--dos-container-and-push-to-acr) below
+- Set up an Azure Kubernetes Server cluster
 - Create both `devsecops-stage` and `devsecops-prod` namespaces in the Kubernetes cluster
+- Install [cert-manager](https://cert-manager.io/) in the cluster
 - Set up the following GitHub repository secrets that the workflow requires:
 
-| Secret                    | Description                                           |
-|---------------------------|-------------------------------------------------------|
-| `AZURE_CREDENTIALS`       | Azure credentials                                     |
-| `AZURE_SUBSCRIPTION_ID`   | Azure Subscription ID                                 |
-| `NGINX_CRT`               | Base 64 encoded version of the NGINX repo certificate |
-| `NGINX_KEY`               | Base 64 encoded version of the NGINX repo key         |
-| `REGISTRY_SERVERNAME`     | Host name of your Azure Container Registry            |
-| `REGISTRY_USERNAME`       | User name for the Azure Container Registry            |
-| `REGISTRY_PASSWORD`       | Password for the Azure Container Registry             |
-| `PENDING_WEBHOOK_URL`     | Webhook URL to send workflow pending events to        |
-| `SUCCESS_WEBHOOK_URL`     | Webhook URL to send workflow success events to        |
-| `FAILURE_WEBHOOK_URL`     | Webhook URL to send workflow failure events to        |
-| `WEBHOOK_SECRET`          | Secret used to hash the Webhook POST body             |
-| `IP_ALLOW_LIST_STAGE`           | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **stage** environment.|
-| `IP_ALLOW_LIST_PROD`           | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **prod** environment.|
+| Secret                    | Description                                                          |
+|---------------------------|----------------------------------------------------------------------|
+| `AZURE_CREDENTIALS`       | Azure credentials                                                    |
+| `AZURE_SUBSCRIPTION_ID`   | Azure Subscription ID                                                |
+| `NGINX_CRT`               | Base 64 encoded version of the NGINX repo certificate                |
+| `NGINX_KEY`               | Base 64 encoded version of the NGINX repo key                        |
+| `TLS_CRT`                 | Base 64 encoded version of the TLS certificate used for the demo app |
+| `TLS_KEY`                 | Base 64 encoded version of the TLS key used for the demo app         |
+| `REGISTRY_SERVERNAME`     | Host name of your Azure Container Registry                           |
+| `REGISTRY_USERNAME`       | User name for the Azure Container Registry                           |
+| `REGISTRY_PASSWORD`       | Password for the Azure Container Registry                            |
+| `PENDING_WEBHOOK_URL`     | Webhook URL to send workflow pending events to                       |
+| `SUCCESS_WEBHOOK_URL`     | Webhook URL to send workflow success events to                       |
+| `FAILURE_WEBHOOK_URL`     | Webhook URL to send workflow failure events to                       |
+| `WEBHOOK_SECRET`          | Secret used to hash the Webhook POST body                            |
+| `ELASTIC_USERNAME`        | Elastic username used for deployment event logging script            |
+| `ELASTIC_PASSWORD`        | Elastic password used for deployment event logging script            |
+| `ELASTIC_URL`             | Base URL of Elastic API used for deployment event logging script. Example: https://my-elastic.example.com:9200            |
+| `IP_ALLOW_LIST_STAGE`     | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **stage** environment.|
+| `IP_ALLOW_LIST_PROD`      | Used by the [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range) to limit traffic to one or more source CIDRs in the **prod** environment.|
 
 
-#### Build NGINX App Protect WAF + DoS Container and push to ACR
-The workflow requires an NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
+#### Build NGINX Ingress Controller + NGINX App Protect WAF + DoS Container and push to ACR
+The workflow requires an NGINX Ingress Controller + NGINX App Protect WAF + DoS base container to be present your the Azure Container Registry. Since these are commercially-licensed products, you will need to request a [free trial](https://www.nginx.com/free-trial-request/), and use this to build your own container.
+
+NOTE: Ensure that your NGINX certificate and key files (`nginx-repo.crt` and `nginx-repo.key`) are present in the root of this directory before executing the following commands.
 
 ``` bash
-cd app-protect
+ACR_NAME=<your ACR name>
+KIC_VERSION=2.1.2
+
 az login --use-device-code
-az acr login --name <your acr name>
+az acr login --name "$ACR_NAME"
 
-DOCKER_BUILDKIT=1 docker build --no-cache --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:3.6 -t <your acr name>.azurecr.io/nginx-app-protect-waf-dos:latest -f Base-Dockerfile .
+git clone -b "v$KIC_VERSION" https://github.com/nginxinc/kubernetes-ingress.git
+cp nginx-repo.* kubernetes-ingress
+pushd kubernetes-ingress
 
-docker push <your acr name>.azurecr.io/nginx-app-protect-waf-dos
+make debian-image-nap-dos-plus PREFIX="$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos" TAG="$KIC_VERSION" TARGET=download
+
+popd
+
+docker tag "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos:$KIC_VERSION" "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos:latest"
+
+docker push --all-tags "$ACR_NAME.azurecr.io/nginx-plus-ingress-nap-waf-dos"
 ```
+
+#### Create Elastic and Kibana Dashboard Resources
+
+This solution makes use of the [Elastic Cloud](https://www.elastic.co/cloud/), specifically Elastic and Kibana for NGINX App Protect WAF & DoS analytics. You can set up a free trial for this, or use an existing subscription. Once available, use the following script to install the resources needed:
+
+``` bash
+cd analytics && ./elastic-setup.sh -a \"https://my-deployment:9243\" -b \"elastic:mypassword\" -c \"https://my-deployment:9243\" -d \"elastic:mypassword\"
+```
+
+#### Create DNS Zones and Records
+
+This is a manual process for now. Refer to [Azure DNS documentation](https://docs.microsoft.com/en-us/azure/dns/) for guidance in creating stage and prod DNS zones and records once AKS has assigned a public IP address to the k8s loadbalancers.
+
 
 #### Delete Old GitHub Actions Runs
 Not specifically required, but deleting old GitHub workflow runs promotes cleanliness, especially when demoing.
@@ -83,14 +115,17 @@ SSH into one of the pods from the above command:
 kubectl exec --stdin --tty -n devsecops-stage nap-dotnetcorewebapp-stage-84dbbb5bbf-7xffw -- /bin/bash
 ```
 
+Show kustomization built configuration for stage environment:
+``` bash
+kustomize build manifests/overlays/stage
+```
+
 #### Deleting Deployments
 If you need to delete stage and prod deployments, use the following commands:
 
 ``` bash
 kubectl delete deployment dotnetcorewebapp-stage -n devsecops-stage
-kubectl delete deployment nap-dotnetcorewebapp-stage -n devsecops-stage
 
-kubectl delete deployment nap-dotnetcorewebapp-prod -n devsecops-prod
 kubectl delete deployment dotnetcorewebapp-prod -n devsecops-prod
 ```
 

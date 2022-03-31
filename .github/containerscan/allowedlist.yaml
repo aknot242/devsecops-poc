@@ -1,3 +1,4 @@
 general:
   vulnerabilities:
     - DKL-DI-0005
+    - CVE-2022-0778

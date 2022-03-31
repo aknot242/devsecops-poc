@@ -1,19 +1,19 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: devsecops-poc
-  # annotations:
-  #   nginx.ingress.kubernetes.io/whitelist-source-range: "<value will be replaced in workflow run>"
+  name: nginx-ingress
 spec:
-  rules:
-    - host: devsecops-poc-prod.28d5d6771fc84adba80b.westus2.aksapp.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nap-dotnetcorewebapp
-                port:
-                  number: 80
+  template:
+    spec:
+      containers:
+        - name: nginx-plus-ingress
+          args:
+            - -nginx-plus
+            - -enable-snippets
+            - -nginx-configmaps=devsecops-prod/nginx-config
+            - -default-server-tls-secret=devsecops-prod/default-server-secret
+            - -enable-app-protect
+            - -enable-app-protect-dos
+            - -watch-namespace=devsecops-prod
+            - -ingress-class=nginx-prod

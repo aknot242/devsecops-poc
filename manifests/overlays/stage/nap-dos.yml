@@ -1,0 +1,16 @@
+---
+apiVersion: appprotectdos.f5.com/v1beta1
+kind: DosProtectedResource
+metadata:
+  name: dos-protected
+spec:
+  name: "devsecops-stage.hazy.beer"
+  apDosPolicy: "devsecops-stage/dospolicy"
+  dosAccessLogDest: "logstash.devsecops-stage.svc.cluster.local:5561"
+  dosSecurityLog:
+    apDosLogConf: doslogconf
+    dosLogDest: "logstash.devsecops-stage.svc.cluster.local:5261"
+  # apDosMonitor:
+  #   uri: "webapp.example.com"
+  #   protocol: "http1"
+  #   timeout: 5

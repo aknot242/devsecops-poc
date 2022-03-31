@@ -34,10 +34,10 @@ kind: Service
 metadata:
   name: dotnetcorewebapp
 spec:
-  type: ClusterIP
   ports:
     - name: app
       port: 3000
+      targetPort: 3000
       protocol: TCP
   selector:
     app: dotnetcorewebapp
